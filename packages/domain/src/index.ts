@@ -52,6 +52,8 @@ export interface PredictionDraft {
   stakeToken?: StakeToken;
   homeTeam?: string;
   awayTeam?: string;
+  kickoffAt?: string;
+  round?: string;
   vapiCallId?: string;
   estimatedReturn?: number;
 }

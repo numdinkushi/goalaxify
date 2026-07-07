@@ -82,6 +82,8 @@ export default defineSchema({
     fixtureId: v.number(),
     homeTeam: v.string(),
     awayTeam: v.string(),
+    kickoffAt: v.optional(v.string()),
+    round: v.optional(v.string()),
     market: predictionMarketValidator,
     selection: v.string(),
     stakeToken: stakeTokenValidator,
