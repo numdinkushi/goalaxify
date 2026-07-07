@@ -35,6 +35,8 @@
   --success: var(--brand-mint);
   --warning: var(--brand-pastel-pink);
 
+  --bottom-nav-height: 4.5rem;
+
   --odds-home: var(--brand-dusty-blue);
   --odds-draw: #64748b;
   --odds-away: var(--brand-coral);
@@ -84,8 +86,14 @@
     @apply border-border;
   }
 
+  html {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
+    overflow-x: hidden;
     background-image:
       radial-gradient(
         circle at 15% 0%,

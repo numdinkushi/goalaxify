@@ -7,7 +7,8 @@ import { ConnectWalletButton } from "@/components/wallet/connect-wallet-button";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { ActionCardView, SettlementBadgeView } from "@/lib/data/types";
-import { AppRoute } from "@/lib/enums";
+import { ProfileTab } from "@/lib/enums";
+import { profileTabHref } from "@/hooks/use-profile-tab";
 import { useWalletSession } from "@/hooks/use-wallet-session";
 import { cn } from "@/lib/utils";
 
@@ -87,8 +88,8 @@ export function ActionCards({ actions, settlement }: ActionCardsProps) {
       {!isConnected && (
         <p className="text-center text-xs text-muted-foreground">
           Need a wallet?{" "}
-          <Link href={AppRoute.Wallet} className="text-brand-coral hover:underline">
-            Set up in Wallet
+          <Link href={profileTabHref(ProfileTab.Wallet)} className="text-brand-coral hover:underline">
+            Set up in Profile
           </Link>
         </p>
       )}

@@ -22,6 +22,12 @@ export const metadata: Metadata = {
     "Voice-native World Cup predictions, live goal moments, and verified settlement.",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover" as const,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -33,7 +39,7 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}
     >
-      <body className="min-h-svh">
+      <body className="min-h-dvh min-h-svh">
         <ConvexClientProvider>
           <SolanaWalletProvider>
             {children}

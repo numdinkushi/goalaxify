@@ -1,5 +1,7 @@
 import { clusterApiUrl } from "@solana/web3.js";
 
+import { getSettlementProgramId } from "@/lib/settlement/config";
+
 export type SolanaNetwork = "devnet" | "mainnet-beta";
 
 export function getSolanaNetwork(): SolanaNetwork {
@@ -15,5 +17,5 @@ export function getSolanaRpcEndpoint(): string {
 }
 
 export function getSolanaProgramId(): string | undefined {
-  return process.env.NEXT_PUBLIC_SOLANA_PROGRAM_ID;
+  return process.env.NEXT_PUBLIC_SOLANA_PROGRAM_ID ?? getSettlementProgramId();
 }

@@ -1,0 +1,25 @@
+{
+  "name": "@goalaxify/solana-settlement",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./config": "./src/config.ts",
+    "./terms": "./src/terms/build-terms-hash.ts",
+    "./pda": "./src/pda/derive-intent-accounts.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.30.1",
+    "@goalaxify/config": "*",
+    "@goalaxify/domain": "*",
+    "@solana/spl-token": "^0.4.9",
+    "@solana/web3.js": "^1.98.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

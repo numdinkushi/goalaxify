@@ -1,5 +1,7 @@
-import { WalletPageContent } from "@/components/wallet/wallet-page-content";
+import { redirect } from "next/navigation";
+
+import { AppRoute, ProfileTab } from "@/lib/enums";
 
 export default function WalletPage() {
-  return <WalletPageContent />;
+  redirect(`${AppRoute.Profiles}?tab=${ProfileTab.Wallet}`);
 }
