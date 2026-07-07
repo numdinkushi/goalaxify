@@ -1,0 +1,160 @@
+@import "tailwindcss";
+
+/* ─── Goalaxify — Stadium Night ──────────────────────────────────────────── */
+:root {
+  --brand-coral: #ff5a45;
+  --brand-charcoal: #f8fafc;
+  --brand-blush: #0b1324;
+  --brand-pastel-pink: #fbbf24;
+  --brand-cream: #1c2b44;
+  --brand-mint: #10b981;
+  --brand-dusty-blue: #38bdf8;
+  --brand-white: #152238;
+
+  --background: var(--brand-blush);
+  --foreground: var(--brand-charcoal);
+  --card: var(--brand-white);
+  --card-foreground: var(--brand-charcoal);
+  --popover: #1c2b44;
+  --popover-foreground: var(--brand-charcoal);
+  --primary: var(--brand-coral);
+  --primary-foreground: #ffffff;
+  --secondary: var(--brand-pastel-pink);
+  --secondary-foreground: #0b1324;
+  --muted: var(--brand-cream);
+  --muted-foreground: #94a3b8;
+  --accent: var(--brand-dusty-blue);
+  --accent-foreground: #0b1324;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #243047;
+  --input: #243047;
+  --ring: var(--brand-coral);
+  --radius: 1rem;
+
+  --success: var(--brand-mint);
+  --warning: var(--brand-pastel-pink);
+
+  --odds-home: var(--brand-dusty-blue);
+  --odds-draw: #64748b;
+  --odds-away: var(--brand-coral);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-brand-coral: var(--brand-coral);
+  --color-brand-charcoal: var(--brand-charcoal);
+  --color-brand-blush: var(--brand-blush);
+  --color-brand-pastel-pink: var(--brand-pastel-pink);
+  --color-brand-cream: var(--brand-cream);
+  --color-brand-mint: var(--brand-mint);
+  --color-brand-dusty-blue: var(--brand-dusty-blue);
+  --color-brand-white: var(--brand-white);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    background-image:
+      radial-gradient(
+        circle at 15% 0%,
+        color-mix(in srgb, var(--brand-coral) 22%, transparent),
+        transparent 40%
+      ),
+      radial-gradient(
+        circle at 85% 8%,
+        color-mix(in srgb, var(--brand-pastel-pink) 12%, transparent),
+        transparent 35%
+      ),
+      radial-gradient(
+        circle at 50% 100%,
+        color-mix(in srgb, var(--brand-dusty-blue) 10%, transparent),
+        transparent 42%
+      );
+  }
+}
+
+@layer utilities {
+  .goalaxify-gradient-text {
+    @apply bg-gradient-to-r from-brand-coral via-brand-pastel-pink to-brand-dusty-blue bg-clip-text text-transparent;
+  }
+
+  .goalaxify-card-shadow {
+    box-shadow:
+      0 1px 2px rgb(0 0 0 / 0.25),
+      0 12px 40px rgb(0 0 0 / 0.35);
+  }
+
+  .goalaxify-soft-ring {
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--brand-coral) 25%, transparent);
+  }
+
+  .goalaxify-glow {
+    box-shadow: 0 0 24px color-mix(in srgb, var(--brand-coral) 35%, transparent);
+  }
+
+  .odds-track {
+    display: flex;
+    height: 0.5rem;
+    overflow: hidden;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--border) 70%, transparent);
+  }
+
+  .odds-track-segment {
+    min-width: 0;
+    transition: width 0.4s ease;
+  }
+
+  .live-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    background: var(--brand-coral);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--brand-coral) 60%, transparent);
+    animation: live-pulse 1.8s ease-out infinite;
+  }
+
+  @keyframes live-pulse {
+    0% {
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--brand-coral) 55%, transparent);
+    }
+    70% {
+      box-shadow: 0 0 0 8px transparent;
+    }
+    100% {
+      box-shadow: 0 0 0 0 transparent;
+    }
+  }
+}

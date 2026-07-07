@@ -1,0 +1,42 @@
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+
+import "./globals.css";
+import { ConvexClientProvider } from "@/components/providers/convex-client-provider";
+import { ThemeProvider } from "@/components/theme-provider";
+
+const fontSans = Geist({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
+
+const fontMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+});
+
+export const metadata: Metadata = {
+  title: "Goalaxify | Talk your bet",
+  description:
+    "Voice-native World Cup predictions, live goal moments, and verified settlement.",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}
+    >
+      <body className="min-h-svh">
+        <ThemeProvider>
+          <ConvexClientProvider>{children}</ConvexClientProvider>
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}

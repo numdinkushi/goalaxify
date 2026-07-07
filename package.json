@@ -1,0 +1,24 @@
+{
+  "name": "goalaxify",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace @goalaxify/web",
+    "convex:dev": "npx convex dev",
+    "convex:seed": "npx convex run fixtures:seed",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "txline:setup": "npm run setup --workspace @goalaxify/txline-sdk"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "convex": "^1.42.1"
+  }
+}
