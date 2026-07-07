@@ -12,6 +12,7 @@ export type FeaturedMatchView = {
   status: MatchStatus;
   round: string;
   boothOpen: boolean;
+  boothStatusLabel: string;
   market: ThreeWayOdds;
   crowd: ThreeWayOdds | null;
   marketDeltaPct: number | null;

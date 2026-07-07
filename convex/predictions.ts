@@ -12,6 +12,13 @@ function normalizeWalletPubkey(walletPubkey: string): string {
   return walletPubkey.trim();
 }
 
+function isKickoffInFuture(kickoffAt: string | undefined, now = Date.now()): boolean {
+  if (!kickoffAt) return true;
+  const kickoffMs = Date.parse(kickoffAt);
+  if (!Number.isFinite(kickoffMs)) return true;
+  return kickoffMs > now;
+}
+
 export const create = mutation({
   args: {
     walletPubkey: v.string(),
@@ -36,6 +43,26 @@ export const create = mutation({
   handler: async (ctx, args) => {
     const now = Date.now();
     const walletPubkey = normalizeWalletPubkey(args.walletPubkey);
+
+    if (!isKickoffInFuture(args.kickoffAt, now)) {
+      throw new Error("Betting is closed — this match has already kicked off");
+    }
+
+    if (!args.supersedesPredictionId) {
+      const walletPredictions = await ctx.db
+        .query("predictions")
+        .withIndex("by_wallet", (q) => q.eq("walletPubkey", walletPubkey))
+        .collect();
+
+      const existingOpen = walletPredictions.find(
+        (entry) =>
+          entry.fixtureId === args.fixtureId && entry.status === "open",
+      );
+
+      if (existingOpen) {
+        throw new Error("You already have an open bet on this match");
+      }
+    }
 
     return ctx.db.insert("predictions", {
       walletPubkey,
@@ -163,6 +190,10 @@ export const markCancelled = mutation({
 
     if (prediction.status !== "open") {
       throw new Error("Only open bets can be changed before kickoff");
+    }
+
+    if (!isKickoffInFuture(prediction.kickoffAt)) {
+      throw new Error("This match has already started — changes are locked");
     }
 
     const manageCount = prediction.manageCount ?? 0;

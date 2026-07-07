@@ -1,51 +1,24 @@
-"use client";
-
 import type { ReactNode } from "react";
-import { useEffect, useRef, useState } from "react";
 
+import { HeroVideoMount } from "@/components/home/hero-video-mount";
 import { cn } from "@/lib/utils";
 
 const DEFAULT_HERO_VIDEO = "/assets/video/goals.mp4";
+const DEFAULT_HERO_POSTER = "/assets/video/poster.jpg";
 
 type HeroVideoBackgroundProps = {
   children: ReactNode;
   videoSrc?: string;
+  posterSrc?: string;
   className?: string;
 };
 
 export function HeroVideoBackground({
   children,
   videoSrc = DEFAULT_HERO_VIDEO,
+  posterSrc = DEFAULT_HERO_POSTER,
   className,
 }: HeroVideoBackgroundProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [reduceMotion, setReduceMotion] = useState(false);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const syncMotionPreference = () => setReduceMotion(mediaQuery.matches);
-
-    syncMotionPreference();
-    mediaQuery.addEventListener("change", syncMotionPreference);
-
-    return () => mediaQuery.removeEventListener("change", syncMotionPreference);
-  }, []);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video || reduceMotion) return;
-
-    const playVideo = async () => {
-      try {
-        await video.play();
-      } catch {
-        // Autoplay can be blocked; poster/overlay still renders.
-      }
-    };
-
-    void playVideo();
-  }, [reduceMotion, videoSrc]);
-
   return (
     <section
       className={cn(
@@ -54,28 +27,14 @@ export function HeroVideoBackground({
         className,
       )}
     >
-      {!reduceMotion ? (
-        <video
-          ref={videoRef}
-          className="absolute inset-0 size-full object-cover"
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          aria-hidden
-          tabIndex={-1}
-        >
-          <source src={videoSrc} type="video/mp4" />
-        </video>
-      ) : (
-        <div
-          className="absolute inset-0 bg-gradient-to-br from-brand-blush via-brand-white to-brand-cream"
-          aria-hidden
-        />
-      )}
+      <div
+        className="absolute inset-0 bg-gradient-to-br from-brand-blush via-brand-white to-brand-cream bg-cover bg-center"
+        style={{ backgroundImage: `url(${posterSrc})` }}
+        aria-hidden
+      />
 
-      {/* Readability overlays */}
+      <HeroVideoMount videoSrc={videoSrc} posterSrc={posterSrc} />
+
       <div
         className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/55 to-background/95"
         aria-hidden

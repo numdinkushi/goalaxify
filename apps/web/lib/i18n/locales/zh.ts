@@ -52,7 +52,10 @@ const locale = {
     crowdLabel: "Goalaxify 球迷",
     crowdHint: "球迷资金去向",
     boothOpen: "语音 Booth 已开放",
-    talkYourBet: "说出你的投注",
+    boothClosed: "投注已关闭 — 比赛进行中",
+    talkYourBet: "语音下注",
+    manageYourBet: "管理您的投注",
+    betPlacedInPlay: "您的投注已锁定至全场结束",
     oddsHelp:
       "选择胜、平或负 — 以简单概率显示，无博彩术语。",
     oddsShifting: "赔率变动中",
@@ -69,6 +72,9 @@ const locale = {
       "与播音员对话可全额退款取消或替换投注。语音确认替代审核步骤 — 仅在新投注需要签名时打开 Phantom。",
     stakeHint:
       "向体育场播音员说出你的预测。语音确认 — 同意后应用自动投注（Phantom 打开以签名）。",
+    lockedTitle: "Booth 已关闭",
+    lockedDescription:
+      "比赛已开始。投注锁定至全场结束 — 不可新增或更改。",
     status: {
       ready: "就绪",
       connecting: "连接中…",

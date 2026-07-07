@@ -51,6 +51,15 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        source: "/_next/(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "no-store, must-revalidate",
+          },
+        ],
+      },
+      {
         source: "/assets/(.*)",
         headers: [
           {

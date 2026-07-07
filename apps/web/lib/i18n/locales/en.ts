@@ -52,7 +52,10 @@ const locale = {
     crowdLabel: "Goalaxify crowd",
     crowdHint: "Where fans are putting money",
     boothOpen: "Voice booth open",
+    boothClosed: "Betting closed — match in play",
     talkYourBet: "Talk your bet",
+    manageYourBet: "Manage your bet",
+    betPlacedInPlay: "Your bet is locked until full time",
     oddsHelp:
       "Pick who wins, if it's a draw, or who takes it away — shown as simple chances, not betting jargon.",
     oddsShifting: "Odds shifting",
@@ -69,6 +72,9 @@ const locale = {
       "Talk to the announcer to cancel for a full refund or replace your bet. Voice confirmation replaces the review step — Phantom opens only when a new stake needs signing.",
     stakeHint:
       "Talk your prediction to the stadium announcer. Confirm by voice — once you agree, the app stakes automatically (Phantom opens to sign).",
+    lockedTitle: "Booth closed",
+    lockedDescription:
+      "This match has kicked off. Bets are locked until full time — no new stakes or changes.",
     status: {
       ready: "Ready",
       connecting: "Connecting…",

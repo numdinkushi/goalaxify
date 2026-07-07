@@ -52,6 +52,9 @@ const locale = {
     crowdLabel: "Goalaxify 크라우드",
     crowdHint: "팬들이 돈을 거는 곳",
     boothOpen: "음성 Booth 개방",
+    boothClosed: "베팅 마감 — 경기 진행 중",
+    manageYourBet: "베팅 관리",
+    betPlacedInPlay: "베팅은 경기 종료까지 잠깁니다",
     talkYourBet: "베팅을 말하세요",
     oddsHelp:
       "승, 무, 패를 선택하세요 — 간단한 확률로 표시, 베팅 전문 용어 없음.",
@@ -69,6 +72,9 @@ const locale = {
       "아나운서와 대화하여 전액 환불 취소 또는 베팅 교체가 가능합니다. 새 스테이크 서명이 필요할 때만 Phantom이 열립니다.",
     stakeHint:
       "경기장 아나운서에게 예측을 말하세요. 음성으로 확인 — 동의하면 앱이 자동으로 스테이크합니다(Phantom에서 서명).",
+    lockedTitle: "Booth 마감",
+    lockedDescription:
+      "경기가 시작되었습니다. 베팅은 종료까지 잠금 — 신규 베팅 및 변경 불가.",
     status: {
       ready: "준비됨",
       connecting: "연결 중…",

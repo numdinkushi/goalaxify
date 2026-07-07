@@ -81,6 +81,13 @@ export function usePredictionStake() {
         throw new Error("Connect your wallet before staking");
       }
 
+      if (draft.kickoffAt) {
+        const kickoffMs = Date.parse(draft.kickoffAt);
+        if (Number.isFinite(kickoffMs) && kickoffMs <= Date.now()) {
+          throw new Error("Betting is closed — this match has already kicked off");
+        }
+      }
+
       if (!wallet.sendTransaction) {
         throw new Error(
           "Your wallet cannot send transactions. Reconnect Phantom and try again.",

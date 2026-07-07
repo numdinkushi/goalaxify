@@ -1,7 +1,7 @@
 import type { FixtureCatalogEntry } from "@/lib/constants/fixtures";
 import { teamFromName } from "@/lib/constants/teams";
 import { MatchStatus } from "@/lib/enums";
-import { deriveMatchStatus } from "@/lib/utils/match";
+import { deriveMatchStatus, isBoothOpenForMatch } from "@/lib/utils/match";
 
 type RawRecord = Record<string, unknown>;
 
@@ -175,6 +175,11 @@ export function listUpcomingTxlineFixtures(
 export function txlineFixtureToCatalogEntry(
   txlineFixture: TxlineFixtureRecord,
 ): FixtureCatalogEntry {
+  const status = deriveMatchStatus(
+    txlineFixture.kickoffAt,
+    txlineFixture.reportedStatus,
+  );
+
   return {
     ref: `TXLINE-${txlineFixture.fixtureId}`,
     fixtureId: txlineFixture.fixtureId,
@@ -184,11 +189,8 @@ export function txlineFixtureToCatalogEntry(
     venue: txlineFixture.venue ?? txlineFixture.competition ?? "TBD",
     kickoffAt: txlineFixture.kickoffAt,
     round: txlineFixture.round ?? txlineFixture.competition ?? "World Cup",
-    status: deriveMatchStatus(
-      txlineFixture.kickoffAt,
-      txlineFixture.reportedStatus,
-    ),
-    boothOpen: true,
+    status,
+    boothOpen: isBoothOpenForMatch(txlineFixture.kickoffAt, status),
     featured: false,
   };
 }
@@ -241,16 +243,19 @@ export function mergeTxlineFixtureIntoCatalog(
   catalog: FixtureCatalogEntry,
   txlineFixture: TxlineFixtureRecord,
 ): FixtureCatalogEntry {
+  const status = deriveMatchStatus(
+    txlineFixture.kickoffAt,
+    txlineFixture.reportedStatus,
+  );
+
   return {
     ...catalog,
     txlineFixtureId: txlineFixture.fixtureId,
     kickoffAt: txlineFixture.kickoffAt,
     venue: txlineFixture.venue ?? txlineFixture.competition ?? catalog.venue,
     round: txlineFixture.round ?? catalog.round,
-    status: deriveMatchStatus(
-      txlineFixture.kickoffAt,
-      txlineFixture.reportedStatus,
-    ),
+    status,
+    boothOpen: isBoothOpenForMatch(txlineFixture.kickoffAt, status),
     home: teamFromName(txlineFixture.homeName),
     away: teamFromName(txlineFixture.awayName),
   };

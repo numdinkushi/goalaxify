@@ -52,6 +52,9 @@ const locale = {
     crowdLabel: "Público Goalaxify",
     crowdHint: "Dónde va el dinero de los fans",
     boothOpen: "Booth de voz abierto",
+    boothClosed: "Apuestas cerradas — partido en juego",
+    manageYourBet: "Gestionar tu apuesta",
+    betPlacedInPlay: "Tu apuesta está bloqueada hasta el final",
     talkYourBet: "Di tu apuesta",
     oddsHelp:
       "Elige quién gana, empate o visitante — en probabilidades simples, sin jerga.",
@@ -69,6 +72,9 @@ const locale = {
       "Habla con el locutor para cancelar con reembolso total o reemplazar tu apuesta. Phantom solo se abre si hay un nuevo stake que firmar.",
     stakeHint:
       "Di tu predicción al locutor. Confirma por voz — al aceptar, la app apuesta automáticamente (Phantom abre para firmar).",
+    lockedTitle: "Booth cerrado",
+    lockedDescription:
+      "El partido ha comenzado. Las apuestas están bloqueadas hasta el final — sin nuevas apuestas ni cambios.",
     status: {
       ready: "Listo",
       connecting: "Conectando…",

@@ -52,6 +52,9 @@ const locale = {
     crowdLabel: "Goalaxifyクラウド",
     crowdHint: "ファンの資金の流れ",
     boothOpen: "音声ブース開放中",
+    boothClosed: "ベット受付終了 — 試合進行中",
+    manageYourBet: "ベットを管理",
+    betPlacedInPlay: "ベットは試合終了までロックされます",
     talkYourBet: "声でベット",
     oddsHelp:
       "勝ち・引き分け・敗北をシンプルな確率で表示 — ベット用語は使いません。",
@@ -69,6 +72,9 @@ const locale = {
       "アナウンサーにキャンセル（全額返金）またはベット変更を話してください。新しいステークの署名時のみPhantomが開きます。",
     stakeHint:
       "スタジアムアナウンサーに予想を話してください。音声で確認すると自動的にステークされます（Phantomで署名）。",
+    lockedTitle: "ブース閉鎖",
+    lockedDescription:
+      "試合が開始されました。ベットは終了までロック — 新規・変更不可。",
     status: {
       ready: "準備完了",
       connecting: "接続中…",

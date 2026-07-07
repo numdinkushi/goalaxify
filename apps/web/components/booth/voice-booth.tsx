@@ -54,6 +54,7 @@ import { waitForSolBalanceAtLeast } from "@/lib/wallet/wait-for-balance";
 type VoiceBoothProps = {
   context: BoothContext;
   manageBet?: BoothManageBet | null;
+  boothLocked?: boolean;
   autoStartSession?: boolean;
   onSessionActiveChange?: (locked: boolean) => void;
 };
@@ -61,6 +62,7 @@ type VoiceBoothProps = {
 export function VoiceBooth({
   context,
   manageBet,
+  boothLocked = false,
   autoStartSession = false,
   onSessionActiveChange,
 }: VoiceBoothProps) {
@@ -95,6 +97,12 @@ export function VoiceBooth({
   const executeVoiceAction = useCallback(
     async (action: BoothToolAction) => {
       if (!walletPubkey) return;
+
+      if (boothLocked) {
+        setActionError(t("booth.lockedDescription"));
+        setActionPhase("error");
+        return;
+      }
 
       setActionError(null);
       setActionType(action.type);
@@ -231,6 +239,7 @@ export function VoiceBooth({
       }
     },
     [
+      boothLocked,
       cancelPrediction,
       connection,
       context.odds,
@@ -238,6 +247,7 @@ export function VoiceBooth({
       prepareStakeBlockhash,
       refreshWalletBalance,
       submitStake,
+      t,
       walletPubkey,
     ],
   );
@@ -314,6 +324,8 @@ export function VoiceBooth({
   ]);
 
   const startSession = () => {
+    if (boothLocked) return;
+
     setActionPhase("listening");
     setActionError(null);
     setSuccessMessage(null);
@@ -402,7 +414,11 @@ export function VoiceBooth({
             </div>
 
             <p className="text-sm leading-relaxed text-muted-foreground">
-              {manageBet ? t("booth.manageHint") : t("booth.stakeHint")}
+              {boothLocked
+                ? t("booth.lockedDescription")
+                : manageBet
+                  ? t("booth.manageHint")
+                  : t("booth.stakeHint")}
             </p>
 
             {actionPhase === "refunding" && (
@@ -451,7 +467,10 @@ export function VoiceBooth({
             )}
 
             <div className="flex flex-wrap gap-2">
-              {!booth.isActive && !booth.isConnecting && !isBusy && (
+              {!boothLocked &&
+                !booth.isActive &&
+                !booth.isConnecting &&
+                !isBusy && (
                 <Button
                   onClick={startSession}
                   disabled={!booth.vapiEnabled || !isConnected}

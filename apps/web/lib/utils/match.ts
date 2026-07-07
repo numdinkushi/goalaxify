@@ -58,6 +58,24 @@ export function hasMatchKickedOff(
   return Number.isFinite(kickoffMs) && now >= kickoffMs;
 }
 
+export function isMatchBettingClosed(
+  kickoffAt: string,
+  status: MatchStatus,
+  now = Date.now(),
+): boolean {
+  if (status === MatchStatus.Finished) return true;
+  if (isMatchLive(status)) return true;
+  return hasMatchKickedOff(kickoffAt, now);
+}
+
+export function isBoothOpenForMatch(
+  kickoffAt: string,
+  status: MatchStatus,
+  now = Date.now(),
+): boolean {
+  return !isMatchBettingClosed(kickoffAt, status, now);
+}
+
 export function isMarketMoving(delta: number): boolean {
   return Math.abs(delta) >= 0.5;
 }

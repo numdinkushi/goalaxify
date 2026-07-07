@@ -52,6 +52,9 @@ const locale = {
     crowdLabel: "Goalaxify-Crowd",
     crowdHint: "Wo Fans ihr Geld setzen",
     boothOpen: "Sprachbooth offen",
+    boothClosed: "Wetten geschlossen — Spiel läuft",
+    manageYourBet: "Wette verwalten",
+    betPlacedInPlay: "Deine Wette ist bis zum Ende gesperrt",
     talkYourBet: "Sag deine Wette",
     oddsHelp:
       "Wähle Sieger, Unentschieden oder Auswärts — als einfache Chancen, ohne Wettjargon.",
@@ -69,6 +72,9 @@ const locale = {
       "Sprich mit dem Sprecher, um mit voller Rückerstattung zu stornieren oder deine Wette zu ersetzen. Phantom öffnet sich nur bei neuem Einsatz zum Signieren.",
     stakeHint:
       "Sag deine Vorhersage dem Stadionsprecher. Bestätige per Sprache — danach setzt die App automatisch (Phantom öffnet zum Signieren).",
+    lockedTitle: "Booth geschlossen",
+    lockedDescription:
+      "Das Spiel hat begonnen. Wetten sind bis zum Ende gesperrt — keine neuen Einsätze oder Änderungen.",
     status: {
       ready: "Bereit",
       connecting: "Verbinden…",

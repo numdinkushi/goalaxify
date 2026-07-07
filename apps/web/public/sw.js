@@ -1,4 +1,4 @@
-const CACHE_VERSION = "v1.0.1";
+const CACHE_VERSION = "v1.0.2";
 const STATIC_CACHE = `goalaxify-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `goalaxify-dynamic-${CACHE_VERSION}`;
 const API_CACHE = `goalaxify-api-${CACHE_VERSION}`;
@@ -119,6 +119,16 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
 
   if (request.method !== "GET" || url.protocol === "chrome-extension:") {
+    return;
+  }
+
+  // Never intercept dev server, HMR, or Next.js build chunks.
+  if (
+    url.hostname === "localhost" ||
+    url.hostname === "127.0.0.1" ||
+    url.pathname.startsWith("/_next/") ||
+    url.search.includes("turbopack")
+  ) {
     return;
   }
 
