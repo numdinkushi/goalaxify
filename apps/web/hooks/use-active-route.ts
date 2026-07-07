@@ -14,6 +14,8 @@ export function useActiveRoute(): AppRoute {
       return AppRoute.Live;
     case AppRoute.Wallet:
       return AppRoute.Wallet;
+    case AppRoute.Profiles:
+      return AppRoute.Profiles;
     case AppRoute.Settings:
       return AppRoute.Settings;
     default:
