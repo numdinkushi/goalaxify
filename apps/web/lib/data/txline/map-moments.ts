@@ -10,8 +10,6 @@ const GOAL_ACTIONS = new Set([
   "penalty_scored",
 ]);
 
-const DEFAULT_CLIP_URL = "/assets/video/goals.mp4";
-
 function asRecord(value: unknown): RawRecord | null {
   return value && typeof value === "object" ? (value as RawRecord) : null;
 }
@@ -151,7 +149,7 @@ export function mapTxlineScoresToMoments(
               : (entry.Participant ?? undefined);
         const team = scoringTeamLabel(scoringSide, homeTeam, awayTeam);
         const scorer = scorerFromEntry(entry);
-        const clipUrl = clipFromEntry(entry) ?? DEFAULT_CLIP_URL;
+        const clipUrl = clipFromEntry(entry);
 
         moments.push({
           id: momentId(fixtureId, "goal", minute, nextHome, nextAway),
@@ -178,7 +176,7 @@ export function mapTxlineScoresToMoments(
     if (GOAL_ACTIONS.has(action) && nextHome === null) {
       const team = scoringTeamLabel(entry.Participant, homeTeam, awayTeam);
       const scorer = scorerFromEntry(entry);
-      const clipUrl = clipFromEntry(entry) ?? DEFAULT_CLIP_URL;
+      const clipUrl = clipFromEntry(entry);
       moments.push({
         id: momentId(fixtureId, "goal", minute, homeScore, awayScore),
         fixtureId,

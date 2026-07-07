@@ -29,6 +29,8 @@ export type MomentView = {
   summary?: string;
   scorer?: string;
   clipUrl?: string;
+  posterUrl?: string;
+  wscContentId?: string;
   createdAt?: number;
 };
 

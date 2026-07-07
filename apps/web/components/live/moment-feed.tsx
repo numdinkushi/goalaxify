@@ -60,6 +60,7 @@ export function MomentFeed({ moments, homeTeam, awayTeam }: MomentFeedProps) {
             {moment.eventType === "goal" && moment.clipUrl && (
               <MomentClip
                 clipUrl={moment.clipUrl}
+                posterUrl={moment.posterUrl}
                 label={`${EVENT_LABELS.goal} at ${moment.minute} minutes`}
               />
             )}

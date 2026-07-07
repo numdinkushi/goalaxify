@@ -10,14 +10,16 @@ const POSTER_URL = "/assets/video/poster.jpg";
 
 type MomentClipProps = {
   clipUrl: string;
+  posterUrl?: string;
   label: string;
 };
 
-export function MomentClip({ clipUrl, label }: MomentClipProps) {
+export function MomentClip({ clipUrl, posterUrl, label }: MomentClipProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const poster = posterUrl ?? POSTER_URL;
 
   useEffect(() => {
     const node = containerRef.current;
@@ -59,7 +61,7 @@ export function MomentClip({ clipUrl, label }: MomentClipProps) {
           ref={videoRef}
           className="aspect-video w-full object-cover"
           src={clipUrl}
-          poster={POSTER_URL}
+          poster={poster}
           preload="none"
           playsInline
           muted
@@ -70,7 +72,7 @@ export function MomentClip({ clipUrl, label }: MomentClipProps) {
       ) : (
         <div
           className="aspect-video w-full bg-cover bg-center"
-          style={{ backgroundImage: `url(${POSTER_URL})` }}
+          style={{ backgroundImage: `url(${poster})` }}
         />
       )}
 
