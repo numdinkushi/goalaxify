@@ -4,6 +4,19 @@ import { useCallback, useState } from "react";
 
 import type { Id } from "@goalaxify/convex/_generated/dataModel";
 import { appToast } from "@/lib/toast";
+import { parseSettlementError } from "@/lib/wallet/stake-balance";
+
+export type CancelPredictionResult = {
+  txSig: string;
+  refundAmount: number;
+  refundToken: string;
+};
+
+type CancelOptions = {
+  reason?: "cancel" | "replace";
+  /** Skip success toast — use when cancel is step 1 of a replace flow. */
+  silent?: boolean;
+};
 
 export function useCancelPrediction() {
   const [cancellingId, setCancellingId] = useState<Id<"predictions"> | null>(
@@ -15,8 +28,14 @@ export function useCancelPrediction() {
     async (
       predictionId: Id<"predictions">,
       walletPubkey: string,
-      reason: "cancel" | "replace" = "cancel",
-    ) => {
+      reasonOrOptions: "cancel" | "replace" | CancelOptions = "cancel",
+    ): Promise<CancelPredictionResult> => {
+      const options: CancelOptions =
+        reasonOrOptions === "cancel" || reasonOrOptions === "replace"
+          ? { reason: reasonOrOptions }
+          : reasonOrOptions;
+      const reason = options.reason ?? "cancel";
+
       setCancellingId(predictionId);
       setError(null);
 
@@ -36,18 +55,30 @@ export function useCancelPrediction() {
         };
 
         if (!response.ok || !payload.ok || !payload.txSig) {
-          throw new Error(payload.error ?? "Cancel failed");
+          throw new Error(
+            parseSettlementError(payload.error ?? "Cancel failed"),
+          );
         }
 
-        appToast.genericSuccess(
-          reason === "replace"
-            ? "Previous bet replaced — refund sent"
-            : `Bet cancelled — ${payload.refundAmount?.toFixed(3) ?? ""} ${payload.refundToken ?? "SOL"} refunded`,
-        );
-        return payload.txSig;
+        const result: CancelPredictionResult = {
+          txSig: payload.txSig,
+          refundAmount: payload.refundAmount ?? 0,
+          refundToken: payload.refundToken ?? "SOL",
+        };
+
+        if (!options.silent) {
+          appToast.genericSuccess(
+            reason === "replace"
+              ? "Previous bet replaced — refund sent"
+              : `Bet cancelled — ${result.refundAmount.toFixed(3)} ${result.refundToken} refunded`,
+          );
+        }
+
+        return result;
       } catch (cause) {
-        const message =
-          cause instanceof Error ? cause.message : "Failed to cancel bet";
+        const message = parseSettlementError(
+          cause instanceof Error ? cause.message : "Failed to cancel bet",
+        );
         setError(message);
         appToast.genericError(message);
         throw cause;

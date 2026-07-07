@@ -19,6 +19,41 @@ export function maxStakeSolFromBalance(balanceLamports: number): number {
   return lamportsToSol(maxLamports);
 }
 
+/** Fit stake to wallet balance, reserving lamports for the transfer tx fee. */
+export function resolveAffordableStakeSol(
+  requestedStakeSol: number,
+  balanceLamports: number,
+): { stakeSol: number; wasAdjusted: boolean } {
+  if (requestedStakeSol <= 0) {
+    throw new Error("Stake amount must be greater than zero.");
+  }
+
+  const maxStake = maxStakeSolFromBalance(balanceLamports);
+  if (maxStake <= 0) {
+    throw new Error(
+      getInsufficientStakeMessage(requestedStakeSol, balanceLamports) ??
+        "Not enough SOL to cover stake and network fees.",
+    );
+  }
+
+  if (requestedStakeSol <= maxStake) {
+    return { stakeSol: requestedStakeSol, wasAdjusted: false };
+  }
+
+  const shortfallLamports =
+    solToLamports(requestedStakeSol) + STAKE_TX_FEE_BUFFER_LAMPORTS - balanceLamports;
+
+  // Only short by fee dust — stake the max affordable amount instead of failing.
+  if (shortfallLamports <= STAKE_TX_FEE_BUFFER_LAMPORTS * 2) {
+    return { stakeSol: maxStake, wasAdjusted: true };
+  }
+
+  throw new Error(
+    getInsufficientStakeMessage(requestedStakeSol, balanceLamports) ??
+      "Not enough SOL to cover stake and network fees.",
+  );
+}
+
 export function getInsufficientStakeMessage(
   stakeSol: number,
   balanceLamports: number,
@@ -91,14 +126,19 @@ export function parseStakeTransactionError(
     const parsed = parseInsufficientLamports(raw);
 
     if (parsed) {
-      const stakeSol =
-        options.intendedStakeSol ??
-        lamportsToSol(parsed.transferLamports);
+      const chainStakeSol = lamportsToSol(parsed.transferLamports);
+      const stakeSol = chainStakeSol;
       const balance = lamportsToSol(parsed.balanceLamports);
       const maxStake = maxStakeSolFromBalance(parsed.balanceLamports);
 
       if (maxStake > 0) {
-        return `Not enough SOL for a ${stakeSol.toFixed(3)} SOL stake. Balance is ${balance.toFixed(4)} SOL — try ${maxStake.toFixed(3)} SOL or less (network fees need a small buffer).`;
+        const contextHint =
+          options.intendedStakeSol !== undefined &&
+          Math.abs(options.intendedStakeSol - chainStakeSol) > 0.001
+            ? ` (transaction tried ${chainStakeSol.toFixed(3)} SOL)`
+            : "";
+
+        return `Not enough SOL for a ${stakeSol.toFixed(3)} SOL stake${contextHint}. Balance is ${balance.toFixed(4)} SOL — try ${maxStake.toFixed(3)} SOL or less (network fees need a small buffer).`;
       }
 
       return `Not enough SOL. Balance is ${balance.toFixed(4)} SOL — add devnet SOL to cover stake and fees.`;
@@ -112,12 +152,39 @@ export function parseStakeTransactionError(
   }
 
   if (/simulation failed|sendtransactionerror|custom program error/i.test(raw)) {
-    return "Transaction failed. Check your SOL balance covers the stake plus network fees, then try again.";
+    return parseSettlementError(raw);
   }
 
   if (raw.length > 280) {
-    return "Transaction failed. Check your SOL balance covers the stake plus network fees, then try again.";
+    return parseSettlementError(raw);
   }
 
   return raw;
+}
+
+/** Friendly messages for server-side pool refunds / payouts. */
+export function parseSettlementError(message: string): string {
+  const lower = message.toLowerCase();
+
+  if (
+    lower.includes("settlement pool cannot cover") ||
+    (lower.includes("insufficient lamports") &&
+      lower.includes("pool authority"))
+  ) {
+    return "Refund from the pot failed — the settlement pool needs a tiny SOL reserve for network fees. Your stake is still safe. Try again in a moment.";
+  }
+
+  if (lower.includes("insufficient lamports")) {
+    return "Settlement transaction failed — not enough SOL in the pool or wallet to cover the transfer and network fees. Try again shortly.";
+  }
+
+  if (lower.includes("simulation failed")) {
+    return "On-chain transaction failed during simulation. Try again in a moment.";
+  }
+
+  if (message.length > 200) {
+    return "Settlement transaction failed. Try again in a moment.";
+  }
+
+  return message;
 }

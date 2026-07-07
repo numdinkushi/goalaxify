@@ -116,7 +116,7 @@ export async function POST(request: Request) {
     });
 
     const refundAmount = fromBaseUnits(
-      refundBaseUnits,
+      refund.paidBaseUnits,
       prediction.stakeToken,
       config,
     );

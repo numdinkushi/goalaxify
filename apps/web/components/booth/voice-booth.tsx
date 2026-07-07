@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { CheckCircle2, Loader2, Mic, MicOff, PhoneOff, Radio } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useConnection } from "@solana/wallet-adapter-react";
+import { PublicKey } from "@solana/web3.js";
 import type { PredictionDraft } from "@goalaxify/domain";
 import type { Id } from "@goalaxify/convex/_generated/dataModel";
 
@@ -40,9 +42,13 @@ import {
 } from "@/lib/vapi/auto-start-guard";
 import { cn } from "@/lib/utils";
 import {
-  getInsufficientStakeMessage,
+  resolveAffordableStakeSol,
+  solToLamports,
+  STAKE_TX_FEE_BUFFER_LAMPORTS,
   parseStakeTransactionError,
+  parseSettlementError,
 } from "@/lib/wallet/stake-balance";
+import { waitForSolBalanceAtLeast } from "@/lib/wallet/wait-for-balance";
 
 type VoiceBoothProps = {
   context: BoothContext;
@@ -65,8 +71,9 @@ export function VoiceBooth({
   autoStartSession = false,
   onSessionActiveChange,
 }: VoiceBoothProps) {
+  const { connection } = useConnection();
   const { isConnected, walletPubkey } = useWalletSession();
-  const { lamports: walletLamports } = useWalletBalance();
+  const { refresh: refreshWalletBalance } = useWalletBalance();
   const { submitStake, prepareStakeBlockhash } = usePredictionStake();
   const { cancelPrediction } = useCancelPrediction();
 
@@ -97,19 +104,36 @@ export function VoiceBooth({
           return;
         }
 
-        setActionPhase("executing");
+        setActionPhase("refunding");
         try {
-          await cancelPrediction(
+          const refund = await cancelPrediction(
             manageBet.predictionId as Id<"predictions">,
             walletPubkey,
           );
+
+          if (refund.refundToken === "SOL") {
+            try {
+              await waitForSolBalanceAtLeast(
+                connection,
+                new PublicKey(walletPubkey),
+                1,
+                refund.txSig,
+              );
+            } catch {
+              // Refund was submitted — balance may lag on devnet.
+            }
+            await refreshWalletBalance();
+          }
+
           setActionPhase("done");
           setSuccessMessage(
             `Bet cancelled — ${manageBet.stakeAmount} ${manageBet.stakeToken} refunded`,
           );
         } catch (cause) {
           setActionError(
-            cause instanceof Error ? cause.message : "Cancel failed",
+            parseSettlementError(
+              cause instanceof Error ? cause.message : "Cancel failed",
+            ),
           );
           setActionPhase("error");
         }
@@ -131,55 +155,87 @@ export function VoiceBooth({
 
       try {
         if (action.type === VoiceActionType.Replace && manageBet) {
-          await cancelPrediction(
+          setActionPhase("refunding");
+          const refund = await cancelPrediction(
             manageBet.predictionId as Id<"predictions">,
             walletPubkey,
-            "replace",
+            { reason: "replace", silent: true },
           );
+
+          const requiredLamports =
+            solToLamports(draft.stake) + STAKE_TX_FEE_BUFFER_LAMPORTS;
+
+          await waitForSolBalanceAtLeast(
+            connection,
+            new PublicKey(walletPubkey),
+            requiredLamports,
+            refund.txSig,
+          );
+          await refreshWalletBalance();
         }
 
-        const stakeToken = draft.stakeToken ?? "SOL";
-        if (
-          stakeToken === "SOL" &&
-          walletLamports !== null &&
-          draft.stake > 0
-        ) {
-          const insufficientMessage = getInsufficientStakeMessage(
+        let stakeDraft = draft;
+        if ((draft.stakeToken ?? "SOL") === "SOL") {
+          const balanceLamports = await connection.getBalance(
+            new PublicKey(walletPubkey),
+          );
+          const { stakeSol } = resolveAffordableStakeSol(
             draft.stake,
-            walletLamports,
+            balanceLamports,
           );
-          if (insufficientMessage) {
-            throw new Error(insufficientMessage);
-          }
+          stakeDraft = {
+            ...draft,
+            stake: stakeSol,
+            estimatedReturn: calculatePotentialPayout(
+              draft.selection as MatchOutcome,
+              stakeSol,
+              context.odds,
+              "SOL",
+            )?.payout,
+          };
+          setPendingDraft(stakeDraft);
         }
 
+        await prepareStakeBlockhash();
         setActionPhase("signing");
         await submitStake(
-          draft,
+          stakeDraft,
           action.type === VoiceActionType.Replace && manageBet
             ? { supersedesPredictionId: manageBet.predictionId as Id<"predictions"> }
             : undefined,
         );
         setActionPhase("done");
         setSuccessMessage(
-          `${OUTCOME_LABELS[draft.selection as MatchOutcome]} · ${draft.stake} ${draft.stakeToken ?? "SOL"} staked`,
+          `${OUTCOME_LABELS[stakeDraft.selection as MatchOutcome]} · ${stakeDraft.stake} ${stakeDraft.stakeToken ?? "SOL"} staked`,
         );
       } catch (cause) {
+        const raw =
+          cause instanceof Error ? cause.message : "Transaction failed";
+        const isRefundStep =
+          action.type === VoiceActionType.Replace &&
+          /insufficient lamports|simulation failed|settlement pool/i.test(raw);
+
         setActionError(
-          parseStakeTransactionError(cause, {
-            intendedStakeSol:
-              (draft.stakeToken ?? "SOL") === "SOL" ? draft.stake : undefined,
-          }),
+          isRefundStep
+            ? parseSettlementError(raw)
+            : parseStakeTransactionError(cause, {
+                intendedStakeSol:
+                  (draft.stakeToken ?? "SOL") === "SOL"
+                    ? draft.stake
+                    : undefined,
+              }),
         );
         setActionPhase("error");
       }
     },
     [
       cancelPrediction,
+      connection,
       context.odds,
       manageBet,
+      prepareStakeBlockhash,
+      refreshWalletBalance,
       submitStake,
-      walletLamports,
       walletPubkey,
     ],
   );
@@ -199,6 +255,7 @@ export function VoiceBooth({
     : null;
 
   const isBusy =
+    actionPhase === "refunding" ||
     actionPhase === "executing" ||
     actionPhase === "signing" ||
     booth.isConnecting;
@@ -333,7 +390,9 @@ export function VoiceBooth({
                 {isBusy
                   ? actionPhase === "signing"
                     ? "Signing…"
-                    : "Processing…"
+                    : actionPhase === "refunding"
+                      ? "Refunding…"
+                      : "Processing…"
                   : STATUS_LABELS[booth.status]}
               </Badge>
             </div>
@@ -343,6 +402,13 @@ export function VoiceBooth({
                 ? "Talk to the announcer to cancel for a full refund or replace your bet. Voice confirmation replaces the review step — Phantom opens only when a new stake needs signing."
                 : "Talk your prediction to the stadium announcer. Confirm by voice — once you agree, the app stakes automatically (Phantom opens to sign)."}
             </p>
+
+            {actionPhase === "refunding" && (
+              <div className="flex items-center gap-2 rounded-xl border border-border/80 bg-muted/40 px-4 py-3 text-sm">
+                <Loader2 className="size-4 animate-spin text-brand-coral" />
+                Refunding your previous stake from the pot…
+              </div>
+            )}
 
             {actionPhase === "signing" && (
               <div className="flex items-center gap-2 rounded-xl border border-border/80 bg-muted/40 px-4 py-3 text-sm">

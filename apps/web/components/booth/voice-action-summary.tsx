@@ -19,6 +19,7 @@ import type { ThreeWayOdds } from "@goalaxify/domain";
 export type VoiceActionPhase =
   | "idle"
   | "listening"
+  | "refunding"
   | "executing"
   | "signing"
   | "done"
@@ -91,17 +92,19 @@ export function VoiceActionSummary({
   const phaseLabel =
     phase === "listening"
       ? "Confirm with your voice — the announcer will proceed automatically."
-      : phase === "executing"
-        ? "Processing your request…"
-        : phase === "signing"
-          ? "Approve in Phantom to sign on-chain…"
-          : phase === "done"
-            ? "Done."
-            : phase === "error"
-              ? "Something went wrong."
-              : manageBet
-                ? "Say cancel or replace — details below."
-                : "Stake details will appear here during your call.";
+      : phase === "refunding"
+        ? "Sending your full refund from the pot…"
+        : phase === "executing"
+          ? "Processing your request…"
+          : phase === "signing"
+            ? "Approve in Phantom to sign on-chain…"
+            : phase === "done"
+              ? "Done."
+              : phase === "error"
+                ? "Something went wrong."
+                : manageBet
+                  ? "Say cancel or replace — details below."
+                  : "Stake details will appear here during your call.";
 
   return (
     <Card className="border-brand-coral/25 bg-gradient-to-br from-brand-coral/5 to-transparent">
@@ -116,12 +119,14 @@ export function VoiceActionSummary({
           <p className="mt-1 text-sm text-muted-foreground">{phaseLabel}</p>
         </div>
 
-        {(phase === "executing" || phase === "signing") && (
+        {(phase === "executing" || phase === "refunding" || phase === "signing") && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Loader2 className="size-4 animate-spin text-brand-coral" />
             {phase === "signing"
               ? "Waiting for wallet approval…"
-              : "Executing on-chain…"}
+              : phase === "refunding"
+                ? "Waiting for refund to land in your wallet…"
+                : "Executing on-chain…"}
           </div>
         )}
 

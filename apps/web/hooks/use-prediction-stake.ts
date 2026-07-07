@@ -24,8 +24,8 @@ import {
   type PreparedBlockhash,
 } from "@/lib/wallet/send-transaction";
 import {
-  getInsufficientStakeMessage,
   parseStakeTransactionError,
+  resolveAffordableStakeSol,
 } from "@/lib/wallet/stake-balance";
 
 type PreparedBlockhashRef = PreparedBlockhash | null;
@@ -103,6 +103,8 @@ export function usePredictionStake() {
           settlementConfig,
         ).toString();
 
+        let finalStakeAmount = draft.stake;
+
         if (stakeToken === "USDC") {
           if (!anchorWallet) {
             throw new Error("Connect your wallet before staking");
@@ -127,6 +129,7 @@ export function usePredictionStake() {
           termsHash = result.termsHash;
           stakeMethod = result.stakeMethod;
           stakeBaseUnits = result.depositBaseUnits.toString();
+          finalStakeAmount = draft.stake;
         } else {
           const poolAuthority = getPoolAuthorityPubkey(network);
           if (!poolAuthority) {
@@ -136,28 +139,33 @@ export function usePredictionStake() {
           }
 
           const balanceLamports = await connection.getBalance(wallet.publicKey);
-          const insufficientMessage = getInsufficientStakeMessage(
+          const { stakeSol } = resolveAffordableStakeSol(
             draft.stake,
             balanceLamports,
           );
-          if (insufficientMessage) {
-            throw new Error(insufficientMessage);
-          }
+          const solDraft = { ...draft, stake: stakeSol, stakeToken: "SOL" as const };
 
           if (!isBlockhashFresh(preparedBlockhashRef.current)) {
-            throw new Error(
-              "Transaction preparation expired. Wait a moment, then click Confirm again.",
-            );
+            const latest = await connection.getLatestBlockhash("confirmed");
+            preparedBlockhashRef.current = {
+              latest,
+              fetchedAt: Date.now(),
+            };
           }
 
           const prepared = preparedBlockhashRef.current;
+          if (!prepared) {
+            throw new Error(
+              "Transaction preparation failed. Wait a moment, then try again.",
+            );
+          }
 
           const poolClient = new PoolEscrowClient(connection, network);
           const sendTransaction = wallet.sendTransaction.bind(wallet);
 
           const result = await poolClient.stakeNativeSol(
             {
-              draft: { ...draft, stakeToken: "SOL" },
+              draft: solDraft,
               payer: wallet.publicKey,
               poolAuthority,
             },
@@ -175,6 +183,7 @@ export function usePredictionStake() {
           intentTxSig = result.txSig;
           stakeMethod = result.stakeMethod;
           stakeBaseUnits = result.depositBaseUnits.toString();
+          finalStakeAmount = solDraft.stake;
         }
 
         await createPrediction({
@@ -187,7 +196,7 @@ export function usePredictionStake() {
           market: draft.market,
           selection: draft.selection,
           stakeToken,
-          stakeAmount: draft.stake,
+          stakeAmount: finalStakeAmount,
           stakeBaseUnits,
           stakeMethod,
           intentId,

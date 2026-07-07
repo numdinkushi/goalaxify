@@ -40,6 +40,8 @@ export interface PayoutInput {
 
 export interface PayoutResult {
   txSig: TransactionSignature;
+  /** Lamports or token base units actually sent (may be less than requested to cover tx fees). */
+  paidBaseUnits: bigint;
 }
 
 export interface IntentAccounts {

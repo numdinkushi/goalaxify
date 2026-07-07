@@ -22,6 +22,9 @@ import {
 } from "../utils/transaction";
 import type { BlockhashWithExpiryBlockHeight, Transaction } from "@solana/web3.js";
 
+/** Lamports the pool authority keeps aside to pay Solana fees on outbound refunds/payouts. */
+const POOL_PAYOUT_FEE_BUFFER_LAMPORTS = BigInt(10_000);
+
 export type SendTransactionFn = (transaction: Transaction) => Promise<string>;
 
 export type StakeNativeSolOptions = {
@@ -78,10 +81,33 @@ export class PoolEscrowClient {
     const config = getSettlementConfig(this.network);
 
     if (input.stakeToken === "SOL") {
+      const balance = BigInt(
+        await this.connection.getBalance(authority.publicKey),
+      );
+      const requested = input.amountBaseUnits;
+
+      if (balance <= POOL_PAYOUT_FEE_BUFFER_LAMPORTS) {
+        throw new Error(
+          "Settlement pool cannot cover this refund — pool authority needs SOL for network fees.",
+        );
+      }
+
+      let payoutLamports = requested;
+      const requiredLamports = requested + POOL_PAYOUT_FEE_BUFFER_LAMPORTS;
+      if (balance < requiredLamports) {
+        payoutLamports = balance - POOL_PAYOUT_FEE_BUFFER_LAMPORTS;
+      }
+
+      if (payoutLamports <= BigInt(0)) {
+        throw new Error(
+          "Settlement pool cannot cover this refund — pool authority needs SOL for network fees.",
+        );
+      }
+
       const transaction = buildNativeTransferTransaction({
         payer: authority.publicKey,
         recipient: input.recipient,
-        lamports: input.amountBaseUnits,
+        lamports: payoutLamports,
       });
 
       await prepareTransactionForSigning(
@@ -97,7 +123,7 @@ export class PoolEscrowClient {
         { commitment: "confirmed" },
       );
 
-      return { txSig };
+      return { txSig, paidBaseUnits: payoutLamports };
     }
 
     const mint = getMintForToken(config, input.stakeToken);
@@ -143,7 +169,7 @@ export class PoolEscrowClient {
       { commitment: "confirmed" },
     );
 
-    return { txSig };
+    return { txSig, paidBaseUnits: input.amountBaseUnits };
   }
 }
 
