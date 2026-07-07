@@ -2,9 +2,15 @@ export enum AppRoute {
   Home = "/",
   Booth = "/booth",
   Live = "/live",
-  Wallet = "/wallet",
+  Leaderboard = "/leaderboard",
   Profiles = "/profiles",
   Settings = "/settings",
+}
+
+export enum ProfileTab {
+  Details = "details",
+  Wallet = "wallet",
+  Bets = "bets",
 }
 
 export enum DataSource {
@@ -43,4 +49,15 @@ export enum BoothCallStatus {
   Active = "active",
   Ended = "ended",
   Error = "error",
+}
+
+export enum BoothSessionMode {
+  Stake = "stake",
+  Manage = "manage",
+}
+
+export enum VoiceActionType {
+  Stake = "stake",
+  Cancel = "cancel",
+  Replace = "replace",
 }

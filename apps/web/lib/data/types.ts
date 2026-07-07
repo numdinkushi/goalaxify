@@ -1,7 +1,6 @@
-import type { MatchOutcome, Team, ThreeWayOdds } from "@goalaxify/domain";
+import type { MatchOutcome, PredictionMarket, Team, ThreeWayOdds } from "@goalaxify/domain";
 
 import type { MatchStatus, OddsSource } from "@/lib/enums";
-import type { PredictionMarket } from "@goalaxify/domain";
 
 export type FeaturedMatchView = {
   ref: string;
@@ -49,6 +48,18 @@ export type BoothContext = {
   round: string;
   kickoffAt?: string;
   market?: PredictionMarket;
+  odds?: ThreeWayOdds;
+};
+
+export type BoothManageBet = {
+  predictionId: string;
+  selection: string;
+  stakeAmount: number;
+  stakeToken: "SOL" | "USDC";
+  homeTeam: string;
+  awayTeam: string;
+  estimatedReturn?: number;
+  kickoffAt?: string;
 };
 
 export type SettlementBadgeView = {

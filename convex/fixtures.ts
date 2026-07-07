@@ -83,6 +83,16 @@ export const getFeaturedFixture = query({
   },
 });
 
+export const getByFixtureId = query({
+  args: { fixtureId: v.number() },
+  handler: async (ctx, { fixtureId }) => {
+    return ctx.db
+      .query("fixtures")
+      .withIndex("by_fixture_id", (q) => q.eq("fixtureId", fixtureId))
+      .first();
+  },
+});
+
 export const listFixtures = query({
   args: {},
   handler: async (ctx) => {

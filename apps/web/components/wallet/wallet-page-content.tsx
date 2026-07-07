@@ -4,6 +4,7 @@ import { Wallet, ShieldCheck, Unplug } from "lucide-react";
 
 import { ConnectWalletButton } from "@/components/wallet/connect-wallet-button";
 import { WalletBalanceCard } from "@/components/wallet/wallet-balance-card";
+import { PredictionsPanel } from "@/components/predictions/predictions-panel";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
@@ -140,6 +141,8 @@ export function WalletPageContent() {
             )}
           </CardContent>
         </Card>
+
+        <PredictionsPanel />
 
         <Card className="border-dashed border-border/80">
           <CardContent className="flex items-start gap-3 p-5 text-sm text-muted-foreground">
