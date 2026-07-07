@@ -1,9 +1,11 @@
-import { TrendingDown, TrendingUp } from "lucide-react";
+import { TrendingDown, TrendingUp, Mic } from "lucide-react";
+import Link from "next/link";
 
 import { KickoffStatus } from "@/components/match/kickoff-status";
 import { OddsBar, OutcomePicker } from "@/components/match/odds-display";
 import { TeamDisplay } from "@/components/match/team-display";
 import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -11,22 +13,28 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import type { FeaturedMatchView } from "@/lib/data/types";
-import { OddsSource } from "@/lib/enums";
+import { buildBoothHref } from "@/lib/data/booth-context";
 import { formatMarketDelta } from "@/lib/utils/format";
-import { getMatchStatusLabel, isMarketMoving, isMatchLive } from "@/lib/utils/match";
+import { getMatchStatusLabel, isMarketMoving, isMatchLive, deriveMatchStatus } from "@/lib/utils/match";
+import { cn } from "@/lib/utils";
 
 type MatchSpotlightCardProps = {
   match: FeaturedMatchView;
 };
 
 export function MatchSpotlightCard({ match }: MatchSpotlightCardProps) {
-  const isLive = isMatchLive(match.status);
-  const marketMoving = isMarketMoving(match.marketDeltaPct);
-  const deltaPositive = match.marketDeltaPct >= 0;
+  const resolvedStatus = deriveMatchStatus(match.kickoffAt, match.status);
+  const isLive = isMatchLive(resolvedStatus);
+  const marketMoving =
+    match.marketDeltaPct !== null && isMarketMoving(match.marketDeltaPct);
+  const deltaPositive = (match.marketDeltaPct ?? 0) >= 0;
   const TrendIcon = deltaPositive ? TrendingUp : TrendingDown;
-  const marketLabel =
-    match.oddsSource === OddsSource.Txline ? "TxLINE market" : "Market odds";
-  const crowdLabel = "Goalaxify crowd";
+  const marketLabel = "TxLINE market";
+  const metaParts = [
+    match.round,
+    match.venue !== match.round ? match.venue : null,
+    match.boothOpen ? "Voice booth open" : null,
+  ].filter(Boolean);
 
   return (
     <Card className="overflow-hidden border-border/80 goalaxify-card-shadow">
@@ -35,14 +43,13 @@ export function MatchSpotlightCard({ match }: MatchSpotlightCardProps) {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between gap-3">
           <Badge variant={isLive ? "live" : "outline"}>
-            {getMatchStatusLabel(match.status).toUpperCase()}
+            {getMatchStatusLabel(resolvedStatus).toUpperCase()}
           </Badge>
-          <KickoffStatus kickoffAt={match.kickoffAt} status={match.status} />
+          <KickoffStatus kickoffAt={match.kickoffAt} status={resolvedStatus} />
         </div>
 
         <CardDescription className="pt-2">
-          {match.round} · {match.venue}
-          {match.boothOpen ? " · Voice booth open" : ""}
+          {metaParts.join(" · ")}
         </CardDescription>
       </CardHeader>
 
@@ -66,14 +73,16 @@ export function MatchSpotlightCard({ match }: MatchSpotlightCardProps) {
             hint="What bookmakers think"
           />
 
-          <OddsBar
-            odds={match.crowd}
-            homeCode={match.home.code}
-            awayCode={match.away.code}
-            label={crowdLabel}
-            hint="Where fans are putting money"
-            compact
-          />
+          {match.crowd ? (
+            <OddsBar
+              odds={match.crowd}
+              homeCode={match.home.code}
+              awayCode={match.away.code}
+              label="Goalaxify crowd"
+              hint="Where fans are putting money"
+              compact
+            />
+          ) : null}
         </div>
 
         <OutcomePicker
@@ -82,12 +91,22 @@ export function MatchSpotlightCard({ match }: MatchSpotlightCardProps) {
           awayCode={match.away.code}
         />
 
+        {match.boothOpen ? (
+          <Link
+            href={buildBoothHref(match.fixtureId)}
+            className={cn(buttonVariants({ variant: "default" }), "w-full")}
+          >
+            <Mic className="size-4" />
+            Talk your bet
+          </Link>
+        ) : null}
+
         <p className="text-center text-xs text-muted-foreground">
           Pick who wins, if it&apos;s a draw, or who takes it away — shown as simple
           chances, not betting jargon.
         </p>
 
-        {marketMoving && (
+        {marketMoving && match.marketDeltaPct !== null ? (
           <div className="flex items-center justify-between rounded-xl border border-brand-mint/30 bg-brand-mint/10 px-4 py-3 text-sm">
             <span className="font-medium text-foreground">Odds shifting</span>
             <span
@@ -97,7 +116,7 @@ export function MatchSpotlightCard({ match }: MatchSpotlightCardProps) {
               {formatMarketDelta(match.marketDeltaPct)} on {match.home.name}
             </span>
           </div>
-        )}
+        ) : null}
       </CardContent>
     </Card>
   );

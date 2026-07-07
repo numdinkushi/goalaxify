@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFileSync, existsSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { Keypair } from "@solana/web3.js";
 import {
@@ -7,11 +7,13 @@ import {
   verifyTxlineAccess,
 } from "../src/index";
 
-function loadEnvFile() {
-  const envPath = resolve(process.cwd(), "../../.env");
-  if (!existsSync(envPath)) return;
+const ROOT_ENV = resolve(process.cwd(), "../../.env");
+const WEB_ENV = resolve(process.cwd(), "../../apps/web/.env.local");
 
-  const content = readFileSync(envPath, "utf8");
+function loadEnvFile(path: string) {
+  if (!existsSync(path)) return;
+
+  const content = readFileSync(path, "utf8");
   for (const line of content.split("\n")) {
     const trimmed = line.trim();
     if (!trimmed || trimmed.startsWith("#")) continue;
@@ -19,6 +21,29 @@ function loadEnvFile() {
     if (!key || process.env[key]) continue;
     process.env[key] = rest.join("=");
   }
+}
+
+function upsertEnvFile(path: string, updates: Record<string, string>) {
+  const lines = existsSync(path)
+    ? readFileSync(path, "utf8").split("\n")
+    : [];
+
+  for (const [key, value] of Object.entries(updates)) {
+    const index = lines.findIndex((line) => line.startsWith(`${key}=`));
+    const nextLine = `${key}=${value}`;
+
+    if (index >= 0) {
+      lines[index] = nextLine;
+    } else {
+      lines.push(nextLine);
+    }
+  }
+
+  writeFileSync(path, `${lines.filter((line, index, all) => {
+    const isTrailingBlank =
+      index === all.length - 1 && line.trim() === "";
+    return !isTrailingBlank;
+  }).join("\n")}\n`);
 }
 
 function loadPayerKeypair(): Keypair | undefined {
@@ -30,12 +55,18 @@ function loadPayerKeypair(): Keypair | undefined {
 }
 
 async function main() {
-  loadEnvFile();
+  loadEnvFile(ROOT_ENV);
+  loadEnvFile(WEB_ENV);
 
-  const payer = loadPayerKeypair();
+  let payer = loadPayerKeypair();
+  let generatedSecret: string | null = null;
+
   if (!payer) {
-    console.log("No SOLANA_DEVNET_WALLET_SECRET found — generating ephemeral wallet.");
-    console.log("Fund this wallet with devnet SOL before subscribing on-chain.");
+    payer = Keypair.generate();
+    generatedSecret = JSON.stringify(Array.from(payer.secretKey));
+    console.log("No SOLANA_DEVNET_WALLET_SECRET found — generated a devnet wallet.");
+    console.log(`Fund this address with devnet SOL: ${payer.publicKey.toBase58()}`);
+    console.log("https://faucet.solana.com/\n");
   }
 
   console.log("Setting up TxLINE World Cup free tier on devnet...");
@@ -45,10 +76,27 @@ async function main() {
     serviceLevelId: 1,
   });
 
+  const envUpdates: Record<string, string> = {
+    TXLINE_GUEST_JWT: access.guestJwt,
+    TXLINE_API_TOKEN: access.apiToken,
+    TXLINE_SUBSCRIPTION_TX_SIG: access.txSig,
+    NEXT_PUBLIC_DATA_SOURCE: "txline",
+  };
+
+  if (generatedSecret) {
+    envUpdates.SOLANA_DEVNET_WALLET_SECRET = generatedSecret;
+  }
+
+  upsertEnvFile(ROOT_ENV, envUpdates);
+  upsertEnvFile(WEB_ENV, envUpdates);
+
   console.log("\nTxLINE access ready:");
   console.log(`  wallet: ${access.walletPublicKey}`);
   console.log(`  txSig:  ${access.txSig}`);
   console.log(`  apiToken: ${access.apiToken.slice(0, 12)}...`);
+  console.log("\nWrote credentials to:");
+  console.log(`  ${ROOT_ENV}`);
+  console.log(`  ${WEB_ENV}`);
 
   console.log("\nVerifying fixtures endpoint...");
   const fixtures = await verifyTxlineAccess(
@@ -57,8 +105,15 @@ async function main() {
     "devnet",
   );
 
-  console.log("Fixtures response sample:");
-  console.log(JSON.stringify(fixtures, null, 2).slice(0, 1200));
+  const fixtureCount = Array.isArray(fixtures) ? fixtures.length : 0;
+  console.log(`Retrieved ${fixtureCount} fixtures from TxLINE.`);
+
+  if (fixtureCount > 0) {
+    console.log("Sample fixture:");
+    console.log(JSON.stringify(fixtures[0], null, 2).slice(0, 800));
+  }
+
+  console.log("\nRestart the dev server: npm run dev");
 }
 
 main().catch((error) => {

@@ -42,11 +42,62 @@ function extractOutcomeDecimals(node: RawRecord): ThreeWayOdds | null {
   return null;
 }
 
+function normalizeTxlinePrice(value: number): number {
+  if (value >= 100) {
+    return value / 1000;
+  }
+
+  return value;
+}
+
+function mapTxlineStablePriceEntry(raw: unknown): ThreeWayOdds | null {
+  if (!raw || typeof raw !== "object") return null;
+
+  const entry = raw as RawRecord;
+  const superOddsType = String(entry.SuperOddsType ?? entry.superOddsType ?? "");
+  if (!superOddsType.includes("1X2_PARTICIPANT_RESULT")) {
+    return null;
+  }
+
+  const marketPeriod = entry.MarketPeriod ?? entry.marketPeriod;
+  if (marketPeriod !== null && marketPeriod !== undefined) {
+    return null;
+  }
+
+  const priceNames = entry.PriceNames ?? entry.priceNames;
+  const prices = entry.Prices ?? entry.prices;
+  if (!Array.isArray(priceNames) || !Array.isArray(prices) || prices.length < 3) {
+    return null;
+  }
+
+  const byName: RawRecord = {};
+  for (let index = 0; index < priceNames.length; index += 1) {
+    const name = String(priceNames[index]).toLowerCase();
+    const price = asNumber(prices[index]);
+    if (!price) continue;
+
+    if (name === "part1" || name === "home") byName.home = normalizeTxlinePrice(price);
+    if (name === "draw") byName.draw = normalizeTxlinePrice(price);
+    if (name === "part2" || name === "away") byName.away = normalizeTxlinePrice(price);
+  }
+
+  return extractOutcomeDecimals(byName);
+}
+
 /**
  * Best-effort mapper for TxLINE odds snapshots.
  * Falls back to null when the payload shape is unknown.
  */
 export function mapTxlineOddsSnapshot(raw: unknown): ThreeWayOdds | null {
+  if (Array.isArray(raw)) {
+    for (const entry of raw) {
+      const mapped = mapTxlineStablePriceEntry(entry);
+      if (mapped) return mapped;
+    }
+
+    return null;
+  }
+
   if (!raw || typeof raw !== "object") return null;
 
   const root = raw as RawRecord;
