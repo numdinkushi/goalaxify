@@ -5,10 +5,12 @@ import { isTxlineConfigured } from "@/lib/data/txline/enrich";
 
 type BoothMatchesSectionProps = {
   initialFixtureId?: number;
+  managePredictionId?: string;
 };
 
 export async function BoothMatchesSection({
   initialFixtureId,
+  managePredictionId,
 }: BoothMatchesSectionProps) {
   const matches = await getDataProvider().getUpcomingMatches();
 
@@ -32,6 +34,10 @@ export async function BoothMatchesSection({
   }
 
   return (
-    <BoothPageContent matches={matches} initialFixtureId={initialFixtureId} />
+    <BoothPageContent
+      matches={matches}
+      initialFixtureId={initialFixtureId}
+      managePredictionId={managePredictionId}
+    />
   );
 }

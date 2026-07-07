@@ -31,6 +31,7 @@ export const create = mutation({
     termsHash: v.optional(v.string()),
     estimatedReturn: v.optional(v.number()),
     vapiCallId: v.optional(v.string()),
+    supersedesPredictionId: v.optional(v.id("predictions")),
   },
   handler: async (ctx, args) => {
     const now = Date.now();
@@ -50,6 +51,8 @@ export const create = mutation({
       stakeBaseUnits: args.stakeBaseUnits,
       stakeMethod: args.stakeMethod,
       status: "open",
+      manageCount: 0,
+      supersedesPredictionId: args.supersedesPredictionId,
       intentId: args.intentId,
       intentTxSig: args.intentTxSig,
       termsHash: args.termsHash,
@@ -132,6 +135,50 @@ export const markClaimed = mutation({
       payoutBaseUnits: args.payoutBaseUnits,
       updatedAt: now,
       resolvedAt: prediction.resolvedAt ?? now,
+    });
+
+    return args.predictionId;
+  },
+});
+
+export const markCancelled = mutation({
+  args: {
+    predictionId: v.id("predictions"),
+    walletPubkey: v.string(),
+    refundTxSig: v.string(),
+    reason: v.optional(v.union(v.literal("cancel"), v.literal("replace"))),
+  },
+  handler: async (ctx, args) => {
+    const prediction = await ctx.db.get(args.predictionId);
+    if (!prediction) {
+      throw new Error("Prediction not found");
+    }
+
+    if (
+      normalizeWalletPubkey(prediction.walletPubkey) !==
+      normalizeWalletPubkey(args.walletPubkey)
+    ) {
+      throw new Error("Wallet mismatch");
+    }
+
+    if (prediction.status !== "open") {
+      throw new Error("Only open bets can be changed before kickoff");
+    }
+
+    const manageCount = prediction.manageCount ?? 0;
+    if (manageCount >= 1) {
+      throw new Error("This bet has already been changed once");
+    }
+
+    const now = Date.now();
+    const terminalStatus = args.reason === "replace" ? "replaced" : "cancelled";
+
+    await ctx.db.patch(args.predictionId, {
+      status: terminalStatus,
+      manageCount: manageCount + 1,
+      claimTxSig: args.refundTxSig,
+      updatedAt: now,
+      resolvedAt: now,
     });
 
     return args.predictionId;

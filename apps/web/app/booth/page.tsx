@@ -8,11 +8,11 @@ import { LogoLoader } from "@/components/ui/logo-loader";
 export const dynamic = "force-dynamic";
 
 type BoothPageProps = {
-  searchParams: Promise<{ fixture?: string }>;
+  searchParams: Promise<{ fixture?: string; prediction?: string }>;
 };
 
 export default async function BoothPage({ searchParams }: BoothPageProps) {
-  const { fixture } = await searchParams;
+  const { fixture, prediction } = await searchParams;
   const requestedFixtureId = fixture ? Number(fixture) : undefined;
   const initialFixtureId = Number.isFinite(requestedFixtureId)
     ? requestedFixtureId
@@ -29,7 +29,10 @@ export default async function BoothPage({ searchParams }: BoothPageProps) {
         <Suspense
           fallback={<LogoLoader message="Loading matches for the booth…" />}
         >
-          <BoothMatchesSection initialFixtureId={initialFixtureId} />
+          <BoothMatchesSection
+            initialFixtureId={initialFixtureId}
+            managePredictionId={prediction}
+          />
         </Suspense>
       </main>
     </AppShell>

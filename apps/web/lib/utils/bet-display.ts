@@ -1,10 +1,21 @@
 import type { Doc } from "@goalaxify/convex/_generated/dataModel";
 import type { PredictionStatus } from "@goalaxify/domain";
 
+import { MAX_BET_MANAGE_COUNT } from "@/lib/constants/predictions";
+import { formatKickoffTime } from "@/lib/utils/format";
+import { formatScheduleDayLabel } from "@/lib/utils/schedule";
+
 export type BetStatusMeta = {
   label: string;
   description: string;
-  tone: "open" | "pending" | "won" | "lost" | "settled";
+  tone:
+    | "open"
+    | "pending"
+    | "won"
+    | "lost"
+    | "settled"
+    | "cancelled"
+    | "replaced";
 };
 
 export function getBetStatusMeta(status: PredictionStatus): BetStatusMeta {
@@ -12,7 +23,7 @@ export function getBetStatusMeta(status: PredictionStatus): BetStatusMeta {
     case "open":
       return {
         label: "Open",
-        description: "Waiting for kickoff",
+        description: "Tap to manage by voice before kickoff",
         tone: "open",
       };
     case "locked":
@@ -39,6 +50,18 @@ export function getBetStatusMeta(status: PredictionStatus): BetStatusMeta {
         description: "Winnings claimed on-chain",
         tone: "settled",
       };
+    case "cancelled":
+      return {
+        label: "Cancelled",
+        description: "Full stake refunded before kickoff",
+        tone: "cancelled",
+      };
+    case "replaced":
+      return {
+        label: "Replaced",
+        description: "Superseded by a newer bet on this match",
+        tone: "replaced",
+      };
     default:
       return {
         label: status,
@@ -59,6 +82,71 @@ export function resolveBetKickoff(
   };
 }
 
+export function isMatchStarted(
+  prediction: Pick<Doc<"predictions">, "status">,
+  kickoffAt?: string,
+  matchStatus?: string,
+): boolean {
+  if (prediction.status === "locked") return true;
+
+  const normalized = matchStatus?.toLowerCase();
+  if (
+    normalized === "live" ||
+    normalized === "halftime" ||
+    normalized === "finished"
+  ) {
+    return true;
+  }
+
+  if (!kickoffAt) return false;
+  const kickoffMs = Date.parse(kickoffAt);
+  if (!Number.isFinite(kickoffMs)) return false;
+  return kickoffMs <= Date.now();
+}
+
+export function canManageBet(
+  prediction: Pick<Doc<"predictions">, "status" | "manageCount">,
+  kickoffAt?: string,
+  matchStatus?: string,
+): boolean {
+  if (prediction.status !== "open") return false;
+  if ((prediction.manageCount ?? 0) >= MAX_BET_MANAGE_COUNT) return false;
+  return !isMatchStarted(prediction, kickoffAt, matchStatus);
+}
+
+export function formatBetKickoff(kickoffAt?: string): {
+  primary: string;
+  secondary: string;
+} {
+  if (!kickoffAt) {
+    return {
+      primary: "Schedule pending",
+      secondary: "Kickoff time not available yet",
+    };
+  }
+
+  const kickoffMs = Date.parse(kickoffAt);
+  if (!Number.isFinite(kickoffMs)) {
+    return {
+      primary: "Schedule pending",
+      secondary: "Kickoff time not available yet",
+    };
+  }
+
+  return {
+    primary: `${formatScheduleDayLabel(kickoffAt)} · ${formatKickoffTime(kickoffAt)}`,
+    secondary: new Intl.DateTimeFormat("en-GB", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).format(new Date(kickoffMs)),
+  };
+}
+
 export function resolveBetPayout(prediction: Doc<"predictions">) {
   const stake = prediction.stakeAmount;
   const token = prediction.stakeToken;
@@ -71,6 +159,10 @@ export function resolveBetPayout(prediction: Doc<"predictions">) {
 
   if (prediction.status === "lost") {
     return { stake, payout: 0, profit: -stake, token, isFinal: true };
+  }
+
+  if (prediction.status === "cancelled" || prediction.status === "replaced") {
+    return { stake, payout: stake, profit: 0, token, isFinal: true };
   }
 
   const payout = prediction.estimatedReturn ?? stake;

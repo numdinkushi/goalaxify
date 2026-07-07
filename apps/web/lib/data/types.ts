@@ -51,6 +51,17 @@ export type BoothContext = {
   odds?: ThreeWayOdds;
 };
 
+export type BoothManageBet = {
+  predictionId: string;
+  selection: string;
+  stakeAmount: number;
+  stakeToken: "SOL" | "USDC";
+  homeTeam: string;
+  awayTeam: string;
+  estimatedReturn?: number;
+  kickoffAt?: string;
+};
+
 export type SettlementBadgeView = {
   label: string;
   provider: string;
