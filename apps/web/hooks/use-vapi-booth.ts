@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { useLanguage } from "@/components/providers/language-provider";
 import type { BoothContext } from "@/lib/data/types";
 import type { BoothManageBet } from "@/lib/data/types";
 import { BoothCallStatus, BoothSessionMode } from "@/lib/enums";
@@ -35,6 +36,7 @@ export function useVapiBooth({
   onSessionEnded,
   onVoiceAction,
 }: UseVapiBoothOptions) {
+  const { language } = useLanguage();
   const [status, setStatus] = useState<BoothCallStatus>(BoothCallStatus.Idle);
   const [callId, setCallId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -93,6 +95,7 @@ export function useVapiBooth({
         walletPubkey,
         mode,
         manageBet,
+        language,
         onCallStart: (id) => {
           callConnectedRef.current = true;
           if (id) setCallId(id);
@@ -139,6 +142,7 @@ export function useVapiBooth({
     }
   }, [
     context,
+    language,
     manageBet,
     mode,
     reportFailure,

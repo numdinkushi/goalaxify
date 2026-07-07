@@ -1,3 +1,5 @@
+"use client";
+
 import { TrendingDown, TrendingUp, Mic } from "lucide-react";
 import Link from "next/link";
 
@@ -14,8 +16,14 @@ import {
 } from "@/components/ui/card";
 import type { FeaturedMatchView } from "@/lib/data/types";
 import { buildBoothHref } from "@/lib/data/booth-context";
+import { useTranslation } from "@/hooks/use-translation";
 import { formatMarketDelta } from "@/lib/utils/format";
-import { getMatchStatusLabel, isMarketMoving, isMatchLive, deriveMatchStatus } from "@/lib/utils/match";
+import {
+  getMatchStatusLabel,
+  isMarketMoving,
+  isMatchLive,
+  deriveMatchStatus,
+} from "@/lib/utils/match";
 import { cn } from "@/lib/utils";
 
 type MatchSpotlightCardProps = {
@@ -23,17 +31,17 @@ type MatchSpotlightCardProps = {
 };
 
 export function MatchSpotlightCard({ match }: MatchSpotlightCardProps) {
+  const { t } = useTranslation();
   const resolvedStatus = deriveMatchStatus(match.kickoffAt, match.status);
   const isLive = isMatchLive(resolvedStatus);
   const marketMoving =
     match.marketDeltaPct !== null && isMarketMoving(match.marketDeltaPct);
   const deltaPositive = (match.marketDeltaPct ?? 0) >= 0;
   const TrendIcon = deltaPositive ? TrendingUp : TrendingDown;
-  const marketLabel = "TxLINE market";
   const metaParts = [
     match.round,
     match.venue !== match.round ? match.venue : null,
-    match.boothOpen ? "Voice booth open" : null,
+    match.boothOpen ? t("match.boothOpen") : null,
   ].filter(Boolean);
 
   return (
@@ -58,19 +66,19 @@ export function MatchSpotlightCard({ match }: MatchSpotlightCardProps) {
           <TeamDisplay team={match.home} align="right" />
           <div className="text-center">
             <p className="text-[10px] tracking-[0.18em] text-muted-foreground uppercase">
-              vs
+              {t("match.vs")}
             </p>
           </div>
           <TeamDisplay team={match.away} align="left" />
         </div>
 
-        <div className="rounded-2xl border border-border/70 bg-muted/50 p-4 space-y-4">
+        <div className="space-y-4 rounded-2xl border border-border/70 bg-muted/50 p-4">
           <OddsBar
             odds={match.market}
             homeCode={match.home.code}
             awayCode={match.away.code}
-            label={marketLabel}
-            hint="What bookmakers think"
+            label={t("match.txlineMarket")}
+            hint={t("match.marketHint")}
           />
 
           {match.crowd ? (
@@ -78,8 +86,8 @@ export function MatchSpotlightCard({ match }: MatchSpotlightCardProps) {
               odds={match.crowd}
               homeCode={match.home.code}
               awayCode={match.away.code}
-              label="Goalaxify crowd"
-              hint="Where fans are putting money"
+              label={t("match.crowdLabel")}
+              hint={t("match.crowdHint")}
               compact
             />
           ) : null}
@@ -97,23 +105,25 @@ export function MatchSpotlightCard({ match }: MatchSpotlightCardProps) {
             className={cn(buttonVariants({ variant: "default" }), "w-full")}
           >
             <Mic className="size-4" />
-            Talk your bet
+            {t("match.talkYourBet")}
           </Link>
         ) : null}
 
         <p className="text-center text-xs text-muted-foreground">
-          Pick who wins, if it&apos;s a draw, or who takes it away — shown as simple
-          chances, not betting jargon.
+          {t("match.oddsHelp")}
         </p>
 
         {marketMoving && match.marketDeltaPct !== null ? (
           <div className="flex items-center justify-between rounded-xl border border-brand-mint/30 bg-brand-mint/10 px-4 py-3 text-sm">
-            <span className="font-medium text-foreground">Odds shifting</span>
+            <span className="font-medium text-foreground">
+              {t("match.oddsShifting")}
+            </span>
             <span
               className={`inline-flex items-center gap-1 font-semibold ${deltaPositive ? "text-success" : "text-destructive"}`}
             >
               <TrendIcon className="size-4" />
-              {formatMarketDelta(match.marketDeltaPct)} on {match.home.name}
+              {formatMarketDelta(match.marketDeltaPct)} {t("match.oddsShiftOn")}{" "}
+              {match.home.name}
             </span>
           </div>
         ) : null}

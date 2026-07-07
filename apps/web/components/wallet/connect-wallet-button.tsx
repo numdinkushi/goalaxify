@@ -6,6 +6,7 @@ import { Wallet } from "lucide-react";
 import { ConnectedWalletMenu } from "@/components/wallet/connected-wallet-menu";
 import { Button } from "@/components/ui/button";
 import { useHydrated } from "@/hooks/use-hydrated";
+import { useTranslation } from "@/hooks/use-translation";
 import { useWalletSession } from "@/hooks/use-wallet-session";
 import { cn } from "@/lib/utils";
 
@@ -24,6 +25,7 @@ export function ConnectWalletButton({
 }: ConnectWalletButtonProps) {
   const hydrated = useHydrated();
   const { setVisible } = useWalletModal();
+  const { t } = useTranslation();
   const { isConnected, connecting, isRestoring, walletPubkey } =
     useWalletSession();
 
@@ -47,7 +49,7 @@ export function ConnectWalletButton({
       onClick={openWalletModal}
     >
       <Wallet className="size-4" />
-      {connecting || isRestoring ? "Reconnecting…" : "Connect wallet"}
+      {connecting || isRestoring ? t("wallet.reconnecting") : t("wallet.connect")}
     </Button>
   );
 }

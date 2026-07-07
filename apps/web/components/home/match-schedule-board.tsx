@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 
 import { MatchSpotlightCard } from "@/components/home/match-spotlight-card";
 import { CollapsibleFixturePicker } from "@/components/match/collapsible-fixture-picker";
+import { useTranslation } from "@/hooks/use-translation";
 import { AppRoute } from "@/lib/enums";
 import type { FeaturedMatchView } from "@/lib/data/types";
 import { formatScheduleDayLabel } from "@/lib/utils/schedule";
@@ -15,6 +16,7 @@ type MatchScheduleBoardProps = {
 };
 
 export function MatchScheduleBoard({ matches }: MatchScheduleBoardProps) {
+  const { t } = useTranslation();
   const defaultFixtureId = matches[0]?.fixtureId ?? 0;
   const [selectedFixtureId, setSelectedFixtureId] = useState(defaultFixtureId);
 
@@ -43,11 +45,13 @@ export function MatchScheduleBoard({ matches }: MatchScheduleBoardProps) {
           <span>
             <span className="live-dot mr-2 inline-block" aria-hidden />
             <span className="font-medium">{liveMatch.home.name}</span>
-            <span className="text-muted-foreground"> vs </span>
+            <span className="text-muted-foreground"> {t("match.vs")} </span>
             <span className="font-medium">{liveMatch.away.name}</span>
-            <span className="text-muted-foreground"> is live now</span>
+            <span className="text-muted-foreground"> {t("match.isLiveNow")}</span>
           </span>
-          <span className="text-xs font-medium text-brand-coral">Open live</span>
+          <span className="text-xs font-medium text-brand-coral">
+            {t("match.openLive")}
+          </span>
         </Link>
       ) : null}
 

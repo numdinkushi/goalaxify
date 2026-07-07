@@ -7,43 +7,43 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLeaderboard } from "@/hooks/use-leaderboard";
+import { useTranslation } from "@/hooks/use-translation";
 import { formatMatchTitle } from "@/lib/utils/format";
 import { formatTokenAmount } from "@/lib/utils/prediction";
 import { shortWalletAddress } from "@/lib/wallet/utils";
 import { cn } from "@/lib/utils";
 
-function rankLabel(index: number) {
-  if (index === 0) return "1st";
-  if (index === 1) return "2nd";
-  if (index === 2) return "3rd";
-  return `${index + 1}th`;
+function rankLabel(index: number, t: (key: string, params?: Record<string, string | number>) => string) {
+  if (index === 0) return t("leaderboard.rank1");
+  if (index === 1) return t("leaderboard.rank2");
+  if (index === 2) return t("leaderboard.rank3");
+  return t("leaderboard.rankNth", { rank: index + 1 });
 }
 
 export function LeaderboardPageContent() {
   const { topWinners, recentWins, loading } = useLeaderboard();
+  const { t } = useTranslation();
 
   return (
     <AppShell>
       <main className="flex flex-1 flex-col gap-6 px-6 pt-8 pb-8">
         <PageHeader
-          eyebrow="Community"
-          title="Leaderboard"
-          description="Top predictors ranked by on-chain winnings. Set a username in Profile to appear by name."
+          eyebrow={t("leaderboard.eyebrow")}
+          title={t("leaderboard.title")}
+          description={t("leaderboard.description")}
         />
 
         <Card className="border-border/80">
           <CardContent className="space-y-4 p-6">
             <div className="flex items-center gap-2">
               <Trophy className="size-5 text-brand-coral" />
-              <p className="text-sm font-semibold">Top winners</p>
+              <p className="text-sm font-semibold">{t("leaderboard.topWinners")}</p>
             </div>
 
             {loading ? (
-              <p className="text-sm text-muted-foreground">Loading leaderboard…</p>
+              <p className="text-sm text-muted-foreground">{t("leaderboard.loading")}</p>
             ) : topWinners.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                No winners yet. Be the first to stake and claim a winning prediction.
-              </p>
+              <p className="text-sm text-muted-foreground">{t("leaderboard.empty")}</p>
             ) : (
               <ul className="space-y-2">
                 {topWinners.map((entry, index) => (
@@ -83,8 +83,10 @@ export function LeaderboardPageContent() {
                           shortWalletAddress(entry.walletPubkey, 6)}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {entry.wins} win{entry.wins === 1 ? "" : "s"} ·{" "}
-                        {rankLabel(index)}
+                        {entry.wins === 1
+                          ? t("leaderboard.wins", { count: entry.wins })
+                          : t("leaderboard.winsPlural", { count: entry.wins })}{" "}
+                        · {rankLabel(index, t)}
                       </p>
                     </div>
 
@@ -92,7 +94,7 @@ export function LeaderboardPageContent() {
                       <p className="font-semibold tabular-nums text-brand-mint">
                         {formatTokenAmount(entry.totalWinnings)} SOL
                       </p>
-                      <p className="text-xs text-muted-foreground">Total won</p>
+                      <p className="text-xs text-muted-foreground">{t("leaderboard.totalWon")}</p>
                     </div>
                   </li>
                 ))}
@@ -103,14 +105,12 @@ export function LeaderboardPageContent() {
 
         <Card className="border-border/80">
           <CardContent className="space-y-4 p-6">
-            <p className="text-sm font-semibold">Recent wins</p>
+            <p className="text-sm font-semibold">{t("leaderboard.recentWins")}</p>
 
             {loading ? (
-              <p className="text-sm text-muted-foreground">Loading recent wins…</p>
+              <p className="text-sm text-muted-foreground">{t("leaderboard.loadingRecent")}</p>
             ) : recentWins.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                Winning predictions will show up here after settlement.
-              </p>
+              <p className="text-sm text-muted-foreground">{t("leaderboard.emptyRecent")}</p>
             ) : (
               <ul className="divide-y divide-border rounded-2xl border border-border/80">
                 {recentWins.map((win) => (

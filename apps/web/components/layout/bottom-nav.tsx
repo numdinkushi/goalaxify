@@ -4,12 +4,14 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
-import { NAV_TABS } from "@/lib/constants/navigation";
+import { NAV_TAB_DEFS } from "@/lib/constants/navigation";
 import { isRouteActive, useActiveRoute } from "@/hooks/use-active-route";
+import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 
 function BottomNavBar() {
   const activeRoute = useActiveRoute();
+  const { t } = useTranslation();
 
   return (
     <nav
@@ -17,7 +19,7 @@ function BottomNavBar() {
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
       <div className="mx-auto flex max-w-lg items-stretch px-0.5 py-1.5 sm:px-1 sm:py-2">
-        {NAV_TABS.map((tab) => {
+        {NAV_TAB_DEFS.map((tab) => {
           const Icon = tab.icon;
           const isActive = isRouteActive(activeRoute, tab.href);
 
@@ -41,7 +43,7 @@ function BottomNavBar() {
                 <Icon className="size-4" strokeWidth={isActive ? 2.5 : 2} />
               </span>
               <span className="max-w-full truncate text-[9px] font-medium sm:text-[10px]">
-                {tab.label}
+                {t(tab.labelKey)}
               </span>
             </Link>
           );

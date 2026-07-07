@@ -2,9 +2,10 @@ import { Suspense } from "react";
 
 import { ActionCards } from "@/components/home/action-cards";
 import { HeroSection } from "@/components/home/hero-section";
+import { HomeMatchesLoader } from "@/components/home/home-matches-loader";
+import { HomeMatchesSectionHeader } from "@/components/home/home-matches-section-header";
 import { UpcomingMatchesSection } from "@/components/home/upcoming-matches-section";
 import { AppShell } from "@/components/layout/app-shell";
-import { LogoLoader } from "@/components/ui/logo-loader";
 import { getDataProvider } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
@@ -23,17 +24,8 @@ export default async function Page() {
 
         <div className="flex flex-col gap-5 px-6">
           <section className="space-y-3">
-            <div>
-              <p className="text-xs font-semibold tracking-[0.18em] text-brand-pastel-pink uppercase">
-                World Cup 2026
-              </p>
-              <h2 className="text-lg font-semibold">Predict a match</h2>
-            </div>
-            <Suspense
-              fallback={
-                <LogoLoader message="Loading World Cup fixtures and odds…" />
-              }
-            >
+            <HomeMatchesSectionHeader />
+            <Suspense fallback={<HomeMatchesLoader />}>
               <UpcomingMatchesSection />
             </Suspense>
           </section>
