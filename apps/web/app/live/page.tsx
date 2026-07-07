@@ -1,28 +1,24 @@
-import { MomentFeed } from "@/components/live/moment-feed";
+import { Suspense } from "react";
+
+import { LivePageContent } from "@/components/live/live-page-content";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
-import { getDataProvider } from "@/lib/data";
+import { LogoLoader } from "@/components/ui/logo-loader";
 
-export default async function LivePage() {
-  const data = getDataProvider();
-  const [featuredMatch, moments] = await Promise.all([
-    data.getFeaturedMatch(),
-    data.getMoments(),
-  ]);
+export const dynamic = "force-dynamic";
 
+export default function LivePage() {
   return (
     <AppShell>
       <main className="flex flex-1 flex-col gap-6 px-6 pt-8 pb-8">
         <PageHeader
           eyebrow="Live pulse"
           title="The Pitch"
-          description="Goal moments, halftime checks, and match rhythm as the booth stays open."
+          description="Goal moments, halftime checks, and match rhythm when a World Cup match is in play."
         />
-        <MomentFeed
-          moments={moments}
-          homeTeam={featuredMatch.home.name}
-          awayTeam={featuredMatch.away.name}
-        />
+        <Suspense fallback={<LogoLoader message="Checking for live matches…" />}>
+          <LivePageContent />
+        </Suspense>
       </main>
     </AppShell>
   );

@@ -16,9 +16,9 @@ export type FixtureCatalogEntry = {
   status: MatchStatus;
   boothOpen: boolean;
   featured: boolean;
-  marketOdds: ThreeWayOdds;
-  crowdOdds: ThreeWayOdds;
-  marketDeltaPct: number;
+  marketOdds?: ThreeWayOdds;
+  crowdOdds?: ThreeWayOdds;
+  marketDeltaPct?: number;
 };
 
 const featuredMarket = buildOddsFromDecimals(1.61, 3.8, 4.2);
@@ -31,9 +31,9 @@ export const FIXTURE_CATALOG: FixtureCatalogEntry[] = [
     home: teamFromCode("BRA"),
     away: teamFromCode("MAR"),
     venue: "Houston",
-    kickoffAt: "2026-07-06T20:00:00.000Z",
+    kickoffAt: "2026-07-07T20:00:00.000Z",
     round: "Round of 16",
-    status: MatchStatus.Live,
+    status: MatchStatus.Scheduled,
     boothOpen: true,
     featured: true,
     marketOdds: featuredMarket,

@@ -2,12 +2,27 @@ import * as anchor from "@coral-xyz/anchor";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   TOKEN_2022_PROGRAM_ID,
+  createAssociatedTokenAccountInstruction,
   getAssociatedTokenAddressSync,
 } from "@solana/spl-token";
-import { Connection, Keypair, PublicKey, SystemProgram } from "@solana/web3.js";
+import {
+  Connection,
+  Keypair,
+  PublicKey,
+  SystemProgram,
+  Transaction,
+  sendAndConfirmTransaction,
+} from "@solana/web3.js";
 import { getTxlineNetworkConfig, type TxlineNetwork } from "@goalaxify/config";
-import txoracleIdl from "@tx-on-chain/idl/txoracle.json";
+import txoracleDevnetIdl from "@tx-on-chain/idl/txoracle-devnet.json";
+import txoracleMainnetIdl from "@tx-on-chain/idl/txoracle.json";
 import type { Txoracle } from "@tx-on-chain/types/txoracle";
+
+function getTxoracleIdl(network: TxlineNetwork): Txoracle {
+  const idl =
+    network === "devnet" ? txoracleDevnetIdl : txoracleMainnetIdl;
+  return idl as Txoracle;
+}
 
 export interface SubscribeInput {
   network?: TxlineNetwork;
@@ -19,6 +34,42 @@ export interface SubscribeInput {
 export interface SubscribeResult {
   txSig: string;
   walletPublicKey: string;
+}
+
+async function ensureUserTokenAccount(
+  connection: Connection,
+  payer: Keypair,
+  tokenMint: PublicKey,
+): Promise<PublicKey> {
+  const userTokenAccount = getAssociatedTokenAddressSync(
+    tokenMint,
+    payer.publicKey,
+    false,
+    TOKEN_2022_PROGRAM_ID,
+    ASSOCIATED_TOKEN_PROGRAM_ID,
+  );
+
+  const accountInfo = await connection.getAccountInfo(userTokenAccount);
+  if (accountInfo) {
+    return userTokenAccount;
+  }
+
+  const transaction = new Transaction().add(
+    createAssociatedTokenAccountInstruction(
+      payer.publicKey,
+      userTokenAccount,
+      payer.publicKey,
+      tokenMint,
+      TOKEN_2022_PROGRAM_ID,
+      ASSOCIATED_TOKEN_PROGRAM_ID,
+    ),
+  );
+
+  await sendAndConfirmTransaction(connection, transaction, [payer], {
+    commitment: "confirmed",
+  });
+
+  return userTokenAccount;
 }
 
 export async function subscribeToFreeTier(
@@ -37,14 +88,15 @@ export async function subscribeToFreeTier(
   anchor.setProvider(provider);
 
   const programId = new PublicKey(config.programId);
-  const program = new anchor.Program<Txoracle>(
-    txoracleIdl as Txoracle,
-    provider,
-  );
+  const idl = getTxoracleIdl(network);
 
-  if (!program.programId.equals(programId)) {
-    throw new Error("Loaded IDL program does not match configured network");
+  if (idl.address !== config.programId) {
+    throw new Error(
+      `Loaded IDL program ${idl.address} does not match ${network} program ${config.programId}`,
+    );
   }
+
+  const program = new anchor.Program<Txoracle>(idl, provider);
 
   const txlTokenMint = new PublicKey(config.txlTokenMint);
 
@@ -66,12 +118,10 @@ export async function subscribeToFreeTier(
     program.programId,
   );
 
-  const userTokenAccount = getAssociatedTokenAddressSync(
+  const userTokenAccount = await ensureUserTokenAccount(
+    connection,
+    input.payer,
     txlTokenMint,
-    provider.wallet.publicKey,
-    false,
-    TOKEN_2022_PROGRAM_ID,
-    ASSOCIATED_TOKEN_PROGRAM_ID,
   );
 
   const txSig = await program.methods

@@ -31,8 +31,13 @@ export async function activateApiToken(input: ActivateTokenInput) {
     throw new Error(`Token activation failed (${response.status}): ${body}`);
   }
 
-  const data = (await response.json()) as { token?: string } | string;
-  return typeof data === "string" ? data : (data.token ?? "");
+  const body = await response.text();
+  try {
+    const data = JSON.parse(body) as { token?: string } | string;
+    return typeof data === "string" ? data : (data.token ?? body.trim());
+  } catch {
+    return body.trim();
+  }
 }
 
 export function buildActivationMessage(

@@ -1,6 +1,5 @@
 import { DataSource } from "@/lib/enums";
 import type { IDataProvider } from "@/lib/data/provider";
-import { mockDataProvider } from "@/lib/data/mock/provider";
 import { txlineDataProvider } from "@/lib/data/mock/provider";
 import { isTxlineConfigured } from "@/lib/data/txline/enrich";
 
@@ -15,17 +14,11 @@ function resolveDataSource(): DataSource {
 }
 
 /**
- * Factory for the active data provider.
- * Auto-selects TxLINE when credentials exist unless NEXT_PUBLIC_DATA_SOURCE=mock.
+ * Match and odds data always flows through the TxLINE provider.
+ * When TxLINE is unavailable, pages show an empty state — never hardcoded fixtures.
  */
 export function getDataProvider(): IDataProvider {
-  const source = resolveDataSource();
-
-  if (source === DataSource.Txline) {
-    return txlineDataProvider;
-  }
-
-  return mockDataProvider;
+  return txlineDataProvider;
 }
 
 export { resolveDataSource };
