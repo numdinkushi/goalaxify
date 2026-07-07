@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:pwa": "next build && cp public/manifest.json .next/static/ && cp public/sw.js .next/static/",
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
