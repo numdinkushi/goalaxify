@@ -12,6 +12,7 @@ export type FeaturedMatchView = {
   status: MatchStatus;
   round: string;
   boothOpen: boolean;
+  boothStatusLabel: string;
   market: ThreeWayOdds;
   crowd: ThreeWayOdds | null;
   marketDeltaPct: number | null;
@@ -19,12 +20,17 @@ export type FeaturedMatchView = {
 };
 
 export type MomentView = {
+  id: string;
   fixtureId: number;
   minute: number;
   homeScore: number;
   awayScore: number;
   eventType: "goal" | "halftime" | "fulltime";
   summary?: string;
+  scorer?: string;
+  clipUrl?: string;
+  posterUrl?: string;
+  wscContentId?: string;
   createdAt?: number;
 };
 

@@ -1,7 +1,8 @@
 import { Suspense } from "react";
 
 import { ActionCards } from "@/components/home/action-cards";
-import { HeroSection } from "@/components/home/hero-section";
+import { HeroSectionContent } from "@/components/home/hero-section-content";
+import { HeroVideoBackground } from "@/components/home/hero-video-background";
 import { HomeMatchesLoader } from "@/components/home/home-matches-loader";
 import { HomeMatchesSectionHeader } from "@/components/home/home-matches-section-header";
 import { UpcomingMatchesSection } from "@/components/home/upcoming-matches-section";
@@ -20,7 +21,9 @@ export default async function Page() {
   return (
     <AppShell>
       <main className="flex flex-1 flex-col gap-8 pb-8">
-        <HeroSection />
+        <HeroVideoBackground>
+          <HeroSectionContent />
+        </HeroVideoBackground>
 
         <div className="flex flex-col gap-5 px-6">
           <section className="space-y-3">

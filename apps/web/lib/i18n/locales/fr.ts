@@ -52,6 +52,9 @@ const locale = {
     crowdLabel: "Foule Goalaxify",
     crowdHint: "Où les fans placent leur argent",
     boothOpen: "Booth vocal ouvert",
+    boothClosed: "Paris fermés — match en cours",
+    manageYourBet: "Gérer votre pari",
+    betPlacedInPlay: "Votre pari est verrouillé jusqu'à la fin",
     talkYourBet: "Dites votre pari",
     oddsHelp:
       "Choisissez le vainqueur, le match nul ou l'équipe extérieure — en probabilités simples, sans jargon.",
@@ -69,6 +72,9 @@ const locale = {
       "Parlez au speaker pour annuler avec remboursement intégral ou remplacer votre pari. Phantom ne s'ouvre que pour signer une nouvelle mise.",
     stakeHint:
       "Dites votre prédiction au speaker du stade. Confirmez par la voix — une fois d'accord, l'app mise automatiquement (Phantom s'ouvre pour signer).",
+    lockedTitle: "Booth fermé",
+    lockedDescription:
+      "Le match a commencé. Les paris sont verrouillés jusqu'à la fin — pas de nouvelles mises ni de modifications.",
     status: {
       ready: "Prêt",
       connecting: "Connexion…",
@@ -102,11 +108,24 @@ const locale = {
     claiming: "Réclamation…",
     manageByVoice: "Gérer par la voix",
     matchLocked: "Match commencé — modifications verrouillées",
+    matchStarts: "Coup d'envoi",
+    finalScore: "Score final",
+    scorePending: "Score en attente",
+    settling: "Règlement de votre pari…",
+    pickCorrect: "Votre pronostic était correct",
+    pickMissedPrefix: "Pronostic raté — résultat :",
+    pickMissed: "Pronostic raté — résultat : {{outcome}}",
+    claimHint: "Appuyez ci-dessous pour transférer les gains vers votre wallet Solana.",
+    viewClaimTx: "Voir la tx de réclamation",
     status: {
       open: { label: "Ouvert", description: "Appuyez pour gérer par la voix avant le coup d'envoi" },
       locked: { label: "En cours", description: "Match commencé — en attente du résultat" },
-      won: { label: "Gagné", description: "Réclamez vos gains" },
-      lost: { label: "Perdu", description: "Bonne chance pour le prochain" },
+      lockedFinished: {
+        label: "Fin du match",
+        description: "Match terminé — règlement en cours",
+      },
+      won: { label: "Gagné", description: "Pronostic correct — réclamez vos gains" },
+      lost: { label: "Perdu", description: "Votre pronostic ne correspond pas au résultat final" },
       settled: { label: "Réglé", description: "Gains réclamés on-chain" },
       cancelled: { label: "Annulé", description: "Mise intégralement remboursée avant le coup d'envoi" },
       replaced: { label: "Remplacé", description: "Remplacé par un pari plus récent sur ce match" },

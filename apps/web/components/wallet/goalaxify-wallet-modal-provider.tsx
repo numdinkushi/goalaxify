@@ -62,19 +62,27 @@ function GoalaxifyWalletModal() {
     null,
   );
 
-  const supportedWallets = useMemo(
-    () =>
-      sortSupportedWallets(
-        wallets.filter((wallet) => {
-          if (wallet.adapter.name === DEFAULT_WALLET_NAME) {
-            return true;
-          }
+  const supportedWallets = useMemo(() => {
+    const seen = new Set<string>();
 
-          return isSupportedWalletName(wallet.adapter.name);
-        }),
-      ),
-    [wallets],
-  );
+    return sortSupportedWallets(
+      wallets.filter((wallet) => {
+        if (seen.has(wallet.adapter.name)) {
+          return false;
+        }
+
+        const supported =
+          wallet.adapter.name === DEFAULT_WALLET_NAME ||
+          isSupportedWalletName(wallet.adapter.name);
+
+        if (supported) {
+          seen.add(wallet.adapter.name);
+        }
+
+        return supported;
+      }),
+    );
+  }, [wallets]);
 
   const resetModalState = useCallback(() => {
     setStep("picker");

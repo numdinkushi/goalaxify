@@ -52,6 +52,9 @@ const locale = {
     crowdLabel: "Goalaxify-Crowd",
     crowdHint: "Wo Fans ihr Geld setzen",
     boothOpen: "Sprachbooth offen",
+    boothClosed: "Wetten geschlossen — Spiel läuft",
+    manageYourBet: "Wette verwalten",
+    betPlacedInPlay: "Deine Wette ist bis zum Ende gesperrt",
     talkYourBet: "Sag deine Wette",
     oddsHelp:
       "Wähle Sieger, Unentschieden oder Auswärts — als einfache Chancen, ohne Wettjargon.",
@@ -69,6 +72,9 @@ const locale = {
       "Sprich mit dem Sprecher, um mit voller Rückerstattung zu stornieren oder deine Wette zu ersetzen. Phantom öffnet sich nur bei neuem Einsatz zum Signieren.",
     stakeHint:
       "Sag deine Vorhersage dem Stadionsprecher. Bestätige per Sprache — danach setzt die App automatisch (Phantom öffnet zum Signieren).",
+    lockedTitle: "Booth geschlossen",
+    lockedDescription:
+      "Das Spiel hat begonnen. Wetten sind bis zum Ende gesperrt — keine neuen Einsätze oder Änderungen.",
     status: {
       ready: "Bereit",
       connecting: "Verbinden…",
@@ -102,11 +108,24 @@ const locale = {
     claiming: "Einfordern…",
     manageByVoice: "Per Sprache verwalten",
     matchLocked: "Spiel gestartet — Änderungen gesperrt",
+    matchStarts: "Anpfiff",
+    finalScore: "Endergebnis",
+    scorePending: "Ergebnis ausstehend",
+    settling: "Wette wird abgerechnet…",
+    pickCorrect: "Deine Prognose war richtig",
+    pickMissedPrefix: "Prognose daneben — Ergebnis:",
+    pickMissed: "Prognose daneben — Ergebnis: {{outcome}}",
+    claimHint: "Tippe unten, um Gewinne auf deine Solana-Wallet zu übertragen.",
+    viewClaimTx: "Claim-Tx ansehen",
     status: {
       open: { label: "Offen", description: "Tippen, um vor Anpfiff per Sprache zu verwalten" },
       locked: { label: "Läuft", description: "Spiel gestartet — Ergebnis ausstehend" },
-      won: { label: "Gewonnen", description: "Fordere deinen Gewinn ein" },
-      lost: { label: "Verloren", description: "Beim nächsten Mal mehr Glück" },
+      lockedFinished: {
+        label: "Spielende",
+        description: "Spiel beendet — Wette wird abgerechnet",
+      },
+      won: { label: "Gewonnen", description: "Prognose richtig — Gewinn einfordern" },
+      lost: { label: "Verloren", description: "Deine Prognose traf das Endergebnis nicht" },
       settled: { label: "Abgerechnet", description: "Gewinn on-chain eingefordert" },
       cancelled: { label: "Storniert", description: "Voller Einsatz vor Anpfiff erstattet" },
       replaced: { label: "Ersetzt", description: "Durch neuere Wette auf dieses Spiel ersetzt" },

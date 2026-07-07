@@ -6,7 +6,7 @@ import {
   WalletProvider,
 } from "@solana/wallet-adapter-react";
 import type { Adapter, WalletError } from "@solana/wallet-adapter-base";
-import { SolflareWalletAdapter } from "@solana/wallet-adapter-wallets";
+import { PhantomWalletAdapter, SolflareWalletAdapter } from "@solana/wallet-adapter-wallets";
 import type { ReactNode } from "react";
 
 import { GoalaxifyWalletModalProvider } from "@/components/wallet/goalaxify-wallet-modal-provider";
@@ -26,7 +26,10 @@ type SolanaWalletProviderProps = {
 
 export function SolanaWalletProvider({ children }: SolanaWalletProviderProps) {
   const endpoint = useMemo(() => getSolanaRpcEndpoint(), []);
-  const wallets = useMemo(() => [new SolflareWalletAdapter()], []);
+  const wallets = useMemo(
+    () => [new PhantomWalletAdapter(), new SolflareWalletAdapter()],
+    [],
+  );
 
   const onWalletError = useCallback((error: WalletError, adapter?: Adapter) => {
     handleWalletError(error, adapter);

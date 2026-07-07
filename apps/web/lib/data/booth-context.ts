@@ -19,6 +19,13 @@ export function buildBoothHref(fixtureId: number): string {
   return `/booth?fixture=${fixtureId}`;
 }
 
+export function buildManageBoothHref(
+  fixtureId: number,
+  predictionId: string,
+): string {
+  return `/booth?fixture=${fixtureId}&prediction=${predictionId}`;
+}
+
 export function resolveInitialFixtureId(
   matches: FeaturedMatchView[],
   requestedFixtureId?: number,

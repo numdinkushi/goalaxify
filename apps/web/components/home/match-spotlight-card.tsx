@@ -1,7 +1,9 @@
 "use client";
 
-import { TrendingDown, TrendingUp, Mic } from "lucide-react";
+import { Lock, Mic, TrendingDown, TrendingUp } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import type { Doc } from "@goalaxify/convex/_generated/dataModel";
 
 import { KickoffStatus } from "@/components/match/kickoff-status";
 import { OddsBar, OutcomePicker } from "@/components/match/odds-display";
@@ -14,15 +16,25 @@ import {
   CardDescription,
   CardHeader,
 } from "@/components/ui/card";
-import type { FeaturedMatchView } from "@/lib/data/types";
-import { buildBoothHref } from "@/lib/data/booth-context";
+import { usePredictions } from "@/hooks/use-predictions";
+import { useLockPredictionsOnKickoff } from "@/hooks/use-lock-predictions-on-kickoff";
 import { useTranslation } from "@/hooks/use-translation";
+import {
+  BET_PLACED_IN_PLAY_LABEL,
+  getBoothStatusLabel,
+} from "@/lib/constants/match-copy";
+import {
+  buildBoothHref,
+  buildManageBoothHref,
+} from "@/lib/data/booth-context";
+import type { FeaturedMatchView } from "@/lib/data/types";
 import { formatMarketDelta } from "@/lib/utils/format";
 import {
+  deriveMatchStatus,
   getMatchStatusLabel,
+  isBoothOpenForMatch,
   isMarketMoving,
   isMatchLive,
-  deriveMatchStatus,
 } from "@/lib/utils/match";
 import { cn } from "@/lib/utils";
 
@@ -30,10 +42,45 @@ type MatchSpotlightCardProps = {
   match: FeaturedMatchView;
 };
 
+function resolveBoothStatusLabel(
+  match: FeaturedMatchView,
+): string {
+  return match.boothStatusLabel ?? getBoothStatusLabel(match.boothOpen);
+}
+
 export function MatchSpotlightCard({ match }: MatchSpotlightCardProps) {
   const { t } = useTranslation();
-  const resolvedStatus = deriveMatchStatus(match.kickoffAt, match.status);
-  const isLive = isMatchLive(resolvedStatus);
+  const { predictions } = usePredictions("open");
+
+  const [displayStatus, setDisplayStatus] = useState(match.status);
+  const [boothOpen, setBoothOpen] = useState(match.boothOpen);
+  const [boothLabel, setBoothLabel] = useState(() =>
+    resolveBoothStatusLabel(match),
+  );
+  const [existingBet, setExistingBet] = useState<
+    Doc<"predictions"> | undefined
+  >(undefined);
+
+  useEffect(() => {
+    const liveStatus = deriveMatchStatus(match.kickoffAt, match.status);
+    const open = isBoothOpenForMatch(match.kickoffAt, liveStatus);
+
+    setDisplayStatus(liveStatus);
+    setBoothOpen(open);
+    setBoothLabel(getBoothStatusLabel(open));
+  }, [match.kickoffAt, match.status]);
+
+  useEffect(() => {
+    setExistingBet(
+      predictions.find(
+        (prediction) => prediction.fixtureId === match.fixtureId,
+      ),
+    );
+  }, [match.fixtureId, predictions]);
+
+  useLockPredictionsOnKickoff(match.fixtureId, match.kickoffAt, match.status);
+
+  const isLive = isMatchLive(displayStatus);
   const marketMoving =
     match.marketDeltaPct !== null && isMarketMoving(match.marketDeltaPct);
   const deltaPositive = (match.marketDeltaPct ?? 0) >= 0;
@@ -41,7 +88,7 @@ export function MatchSpotlightCard({ match }: MatchSpotlightCardProps) {
   const metaParts = [
     match.round,
     match.venue !== match.round ? match.venue : null,
-    match.boothOpen ? t("match.boothOpen") : null,
+    boothLabel,
   ].filter(Boolean);
 
   return (
@@ -51,12 +98,12 @@ export function MatchSpotlightCard({ match }: MatchSpotlightCardProps) {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between gap-3">
           <Badge variant={isLive ? "live" : "outline"}>
-            {getMatchStatusLabel(resolvedStatus).toUpperCase()}
+            {getMatchStatusLabel(displayStatus).toUpperCase()}
           </Badge>
-          <KickoffStatus kickoffAt={match.kickoffAt} status={resolvedStatus} />
+          <KickoffStatus kickoffAt={match.kickoffAt} status={displayStatus} />
         </div>
 
-        <CardDescription className="pt-2">
+        <CardDescription className="pt-2" suppressHydrationWarning>
           {metaParts.join(" · ")}
         </CardDescription>
       </CardHeader>
@@ -99,7 +146,22 @@ export function MatchSpotlightCard({ match }: MatchSpotlightCardProps) {
           awayCode={match.away.code}
         />
 
-        {match.boothOpen ? (
+        {!boothOpen ? (
+          <div className="flex items-center gap-3 rounded-2xl border border-border/80 bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
+            <Lock className="size-4 shrink-0" />
+            <span suppressHydrationWarning>
+              {existingBet ? BET_PLACED_IN_PLAY_LABEL : boothLabel}
+            </span>
+          </div>
+        ) : existingBet ? (
+          <Link
+            href={buildManageBoothHref(match.fixtureId, existingBet._id)}
+            className={cn(buttonVariants({ variant: "secondary" }), "w-full")}
+          >
+            <Mic className="size-4" />
+            {t("match.manageYourBet")}
+          </Link>
+        ) : (
           <Link
             href={buildBoothHref(match.fixtureId)}
             className={cn(buttonVariants({ variant: "default" }), "w-full")}
@@ -107,7 +169,7 @@ export function MatchSpotlightCard({ match }: MatchSpotlightCardProps) {
             <Mic className="size-4" />
             {t("match.talkYourBet")}
           </Link>
-        ) : null}
+        )}
 
         <p className="text-center text-xs text-muted-foreground">
           {t("match.oddsHelp")}

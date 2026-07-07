@@ -52,7 +52,10 @@ const locale = {
     crowdLabel: "Goalaxify crowd",
     crowdHint: "Where fans are putting money",
     boothOpen: "Voice booth open",
+    boothClosed: "Betting closed — match in play",
     talkYourBet: "Talk your bet",
+    manageYourBet: "Manage your bet",
+    betPlacedInPlay: "Your bet is locked until full time",
     oddsHelp:
       "Pick who wins, if it's a draw, or who takes it away — shown as simple chances, not betting jargon.",
     oddsShifting: "Odds shifting",
@@ -69,6 +72,9 @@ const locale = {
       "Talk to the announcer to cancel for a full refund or replace your bet. Voice confirmation replaces the review step — Phantom opens only when a new stake needs signing.",
     stakeHint:
       "Talk your prediction to the stadium announcer. Confirm by voice — once you agree, the app stakes automatically (Phantom opens to sign).",
+    lockedTitle: "Booth closed",
+    lockedDescription:
+      "This match has kicked off. Bets are locked until full time — no new stakes or changes.",
     status: {
       ready: "Ready",
       connecting: "Connecting…",
@@ -102,11 +108,24 @@ const locale = {
     claiming: "Claiming…",
     manageByVoice: "Manage by voice",
     matchLocked: "Match started — changes locked",
+    matchStarts: "Match starts",
+    finalScore: "Final score",
+    scorePending: "Score pending",
+    settling: "Settling your bet…",
+    pickCorrect: "Your pick was correct",
+    pickMissedPrefix: "Your pick missed — result was",
+    pickMissed: "Your pick missed — result was {{outcome}}",
+    claimHint: "Tap below to transfer winnings to your wallet on Solana.",
+    viewClaimTx: "View claim tx",
     status: {
       open: { label: "Open", description: "Tap to manage by voice before kickoff" },
       locked: { label: "In play", description: "Match started — awaiting result" },
-      won: { label: "Won", description: "Claim your winnings" },
-      lost: { label: "Lost", description: "Better luck on the next one" },
+      lockedFinished: {
+        label: "Full time",
+        description: "Match ended — settling your bet now",
+      },
+      won: { label: "Won", description: "Your prediction was right — claim your winnings" },
+      lost: { label: "Lost", description: "Your prediction missed the final result" },
       settled: { label: "Settled", description: "Winnings claimed on-chain" },
       cancelled: { label: "Cancelled", description: "Full stake refunded before kickoff" },
       replaced: { label: "Replaced", description: "Superseded by a newer bet on this match" },

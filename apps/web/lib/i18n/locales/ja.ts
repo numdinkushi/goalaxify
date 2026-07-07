@@ -52,6 +52,9 @@ const locale = {
     crowdLabel: "Goalaxifyクラウド",
     crowdHint: "ファンの資金の流れ",
     boothOpen: "音声ブース開放中",
+    boothClosed: "ベット受付終了 — 試合進行中",
+    manageYourBet: "ベットを管理",
+    betPlacedInPlay: "ベットは試合終了までロックされます",
     talkYourBet: "声でベット",
     oddsHelp:
       "勝ち・引き分け・敗北をシンプルな確率で表示 — ベット用語は使いません。",
@@ -69,6 +72,9 @@ const locale = {
       "アナウンサーにキャンセル（全額返金）またはベット変更を話してください。新しいステークの署名時のみPhantomが開きます。",
     stakeHint:
       "スタジアムアナウンサーに予想を話してください。音声で確認すると自動的にステークされます（Phantomで署名）。",
+    lockedTitle: "ブース閉鎖",
+    lockedDescription:
+      "試合が開始されました。ベットは終了までロック — 新規・変更不可。",
     status: {
       ready: "準備完了",
       connecting: "接続中…",
@@ -102,11 +108,24 @@ const locale = {
     claiming: "請求中…",
     manageByVoice: "音声で管理",
     matchLocked: "試合開始 — 変更不可",
+    matchStarts: "試合開始",
+    finalScore: "最終スコア",
+    scorePending: "スコア待ち",
+    settling: "ベットを精算中…",
+    pickCorrect: "予想が的中しました",
+    pickMissedPrefix: "予想外れ — 結果は",
+    pickMissed: "予想外れ — 結果は{{outcome}}",
+    claimHint: "下のボタンでSolanaウォレットに勝利金を送金します。",
+    viewClaimTx: "請求トランザクションを見る",
     status: {
       open: { label: "オープン", description: "キックオフ前に音声で管理" },
       locked: { label: "試合中", description: "試合開始 — 結果待ち" },
-      won: { label: "勝利", description: "勝利金を請求" },
-      lost: { label: "敗北", description: "次の試合に期待" },
+      lockedFinished: {
+        label: "試合終了",
+        description: "試合終了 — ベットを精算中",
+      },
+      won: { label: "勝利", description: "予想的中 — 勝利金を請求" },
+      lost: { label: "敗北", description: "予想が最終結果と一致しませんでした" },
       settled: { label: "決済済", description: "オンチェーンで請求済" },
       cancelled: { label: "キャンセル", description: "キックオフ前に全額返金" },
       replaced: { label: "変更済", description: "新しいベットに置き換え" },

@@ -52,6 +52,9 @@ const locale = {
     crowdLabel: "Público Goalaxify",
     crowdHint: "Dónde va el dinero de los fans",
     boothOpen: "Booth de voz abierto",
+    boothClosed: "Apuestas cerradas — partido en juego",
+    manageYourBet: "Gestionar tu apuesta",
+    betPlacedInPlay: "Tu apuesta está bloqueada hasta el final",
     talkYourBet: "Di tu apuesta",
     oddsHelp:
       "Elige quién gana, empate o visitante — en probabilidades simples, sin jerga.",
@@ -69,6 +72,9 @@ const locale = {
       "Habla con el locutor para cancelar con reembolso total o reemplazar tu apuesta. Phantom solo se abre si hay un nuevo stake que firmar.",
     stakeHint:
       "Di tu predicción al locutor. Confirma por voz — al aceptar, la app apuesta automáticamente (Phantom abre para firmar).",
+    lockedTitle: "Booth cerrado",
+    lockedDescription:
+      "El partido ha comenzado. Las apuestas están bloqueadas hasta el final — sin nuevas apuestas ni cambios.",
     status: {
       ready: "Listo",
       connecting: "Conectando…",
@@ -102,11 +108,24 @@ const locale = {
     claiming: "Cobrando…",
     manageByVoice: "Gestionar por voz",
     matchLocked: "Partido iniciado — cambios bloqueados",
+    matchStarts: "Inicio del partido",
+    finalScore: "Marcador final",
+    scorePending: "Marcador pendiente",
+    settling: "Liquidando tu apuesta…",
+    pickCorrect: "Tu pronóstico fue correcto",
+    pickMissedPrefix: "Pronóstico fallido — resultado:",
+    pickMissed: "Pronóstico fallido — resultado: {{outcome}}",
+    claimHint: "Toca abajo para transferir las ganancias a tu wallet Solana.",
+    viewClaimTx: "Ver tx de cobro",
     status: {
       open: { label: "Abierta", description: "Toca para gestionar por voz antes del pitido" },
       locked: { label: "En juego", description: "Partido iniciado — esperando resultado" },
-      won: { label: "Ganada", description: "Cobra tus ganancias" },
-      lost: { label: "Perdida", description: "Mejor suerte en la próxima" },
+      lockedFinished: {
+        label: "Final del partido",
+        description: "Partido terminado — liquidando tu apuesta",
+      },
+      won: { label: "Ganada", description: "Pronóstico correcto — cobra tus ganancias" },
+      lost: { label: "Perdida", description: "Tu pronóstico no coincidió con el resultado final" },
       settled: { label: "Liquidada", description: "Ganancias cobradas on-chain" },
       cancelled: { label: "Cancelada", description: "Stake reembolsado antes del pitido" },
       replaced: { label: "Reemplazada", description: "Sustituida por una apuesta más nueva" },

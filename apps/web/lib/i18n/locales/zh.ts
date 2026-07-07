@@ -52,7 +52,10 @@ const locale = {
     crowdLabel: "Goalaxify 球迷",
     crowdHint: "球迷资金去向",
     boothOpen: "语音 Booth 已开放",
-    talkYourBet: "说出你的投注",
+    boothClosed: "投注已关闭 — 比赛进行中",
+    talkYourBet: "语音下注",
+    manageYourBet: "管理您的投注",
+    betPlacedInPlay: "您的投注已锁定至全场结束",
     oddsHelp:
       "选择胜、平或负 — 以简单概率显示，无博彩术语。",
     oddsShifting: "赔率变动中",
@@ -69,6 +72,9 @@ const locale = {
       "与播音员对话可全额退款取消或替换投注。语音确认替代审核步骤 — 仅在新投注需要签名时打开 Phantom。",
     stakeHint:
       "向体育场播音员说出你的预测。语音确认 — 同意后应用自动投注（Phantom 打开以签名）。",
+    lockedTitle: "Booth 已关闭",
+    lockedDescription:
+      "比赛已开始。投注锁定至全场结束 — 不可新增或更改。",
     status: {
       ready: "就绪",
       connecting: "连接中…",
@@ -102,11 +108,24 @@ const locale = {
     claiming: "领取中…",
     manageByVoice: "语音管理",
     matchLocked: "比赛已开始 — 更改已锁定",
+    matchStarts: "开赛时间",
+    finalScore: "最终比分",
+    scorePending: "比分待定",
+    settling: "正在结算您的投注…",
+    pickCorrect: "您的预测正确",
+    pickMissedPrefix: "预测错误 — 结果为",
+    pickMissed: "预测错误 — 结果为{{outcome}}",
+    claimHint: "点击下方将奖金转入您的 Solana 钱包。",
+    viewClaimTx: "查看领取交易",
     status: {
       open: { label: "开放", description: "开赛前点击以语音管理" },
       locked: { label: "进行中", description: "比赛已开始 — 等待结果" },
-      won: { label: "获胜", description: "领取你的奖金" },
-      lost: { label: "失败", description: "下次好运" },
+      lockedFinished: {
+        label: "全场结束",
+        description: "比赛已结束 — 正在结算投注",
+      },
+      won: { label: "获胜", description: "预测正确 — 领取奖金" },
+      lost: { label: "失败", description: "您的预测与最终结果不符" },
       settled: { label: "已结算", description: "链上已领取奖金" },
       cancelled: { label: "已取消", description: "开赛前全额退款" },
       replaced: { label: "已替换", description: "已被该比赛的较新投注取代" },

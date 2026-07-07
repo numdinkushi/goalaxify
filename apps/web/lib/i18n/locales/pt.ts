@@ -52,6 +52,9 @@ const locale = {
     crowdLabel: "Torcida Goalaxify",
     crowdHint: "Onde os fãs estão colocando dinheiro",
     boothOpen: "Booth de voz aberto",
+    boothClosed: "Apostas fechadas — jogo em andamento",
+    manageYourBet: "Gerenciar sua aposta",
+    betPlacedInPlay: "Sua aposta está bloqueada até o fim",
     talkYourBet: "Diga sua aposta",
     oddsHelp:
       "Escolha quem vence, empate ou visitante — em probabilidades simples, sem jargão.",
@@ -69,6 +72,9 @@ const locale = {
       "Fale com o locutor para cancelar com reembolso total ou substituir sua aposta. Phantom só abre se houver um novo stake para assinar.",
     stakeHint:
       "Diga sua previsão ao locutor do estádio. Confirme por voz — ao concordar, o app aposta automaticamente (Phantom abre para assinar).",
+    lockedTitle: "Booth fechado",
+    lockedDescription:
+      "A partida começou. Apostas bloqueadas até o fim — sem novas apostas ou alterações.",
     status: {
       ready: "Pronto",
       connecting: "Conectando…",
@@ -102,11 +108,24 @@ const locale = {
     claiming: "Resgatando…",
     manageByVoice: "Gerenciar por voz",
     matchLocked: "Jogo iniciado — alterações bloqueadas",
+    matchStarts: "Início do jogo",
+    finalScore: "Placar final",
+    scorePending: "Placar pendente",
+    settling: "Liquidando sua aposta…",
+    pickCorrect: "Seu palpite estava certo",
+    pickMissedPrefix: "Palpite errado — resultado foi",
+    pickMissed: "Palpite errado — resultado foi {{outcome}}",
+    claimHint: "Toque abaixo para transferir os ganhos para sua carteira Solana.",
+    viewClaimTx: "Ver tx de resgate",
     status: {
       open: { label: "Aberta", description: "Toque para gerenciar por voz antes do apito" },
       locked: { label: "Em jogo", description: "Jogo iniciado — aguardando resultado" },
-      won: { label: "Ganhou", description: "Resgate seus ganhos" },
-      lost: { label: "Perdeu", description: "Mais sorte na próxima" },
+      lockedFinished: {
+        label: "Fim de jogo",
+        description: "Jogo encerrado — liquidando sua aposta",
+      },
+      won: { label: "Ganhou", description: "Palpite certo — resgate seus ganhos" },
+      lost: { label: "Perdeu", description: "Seu palpite não correspondeu ao resultado final" },
       settled: { label: "Liquidada", description: "Ganhos resgatados on-chain" },
       cancelled: { label: "Cancelada", description: "Stake reembolsado antes do apito" },
       replaced: { label: "Substituída", description: "Substituída por uma aposta mais recente" },

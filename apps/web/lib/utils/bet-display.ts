@@ -1,7 +1,9 @@
 import type { Doc } from "@goalaxify/convex/_generated/dataModel";
-import type { PredictionStatus } from "@goalaxify/domain";
+import type { MatchOutcome, PredictionStatus } from "@goalaxify/domain";
 
 import { MAX_BET_MANAGE_COUNT } from "@/lib/constants/predictions";
+import { OUTCOME_LABELS } from "@/lib/data/types";
+import { MatchStatus } from "@/lib/enums";
 import { formatKickoffTime } from "@/lib/utils/format";
 import { formatScheduleDayLabel } from "@/lib/utils/schedule";
 
@@ -168,4 +170,68 @@ export function resolveBetPayout(prediction: Doc<"predictions">) {
   const payout = prediction.estimatedReturn ?? stake;
   const profit = Math.max(payout - stake, 0);
   return { stake, payout, profit, token, isFinal: false };
+}
+
+export function formatFinalScore(
+  homeScore?: number,
+  awayScore?: number,
+): string | null {
+  if (homeScore === undefined || awayScore === undefined) {
+    return null;
+  }
+
+  return `${homeScore}–${awayScore}`;
+}
+
+export function resolveBetVerdict(
+  prediction: Pick<Doc<"predictions">, "selection" | "status" | "homeTeam" | "awayTeam">,
+  winningSelection?: string,
+): {
+  isCorrect: boolean | null;
+  winningLabel: string | null;
+} {
+  if (
+    prediction.status === "won" ||
+    prediction.status === "settled"
+  ) {
+    return {
+      isCorrect: true,
+      winningLabel:
+        OUTCOME_LABELS[prediction.selection as MatchOutcome] ??
+        prediction.selection,
+    };
+  }
+
+  if (prediction.status === "lost") {
+    const winningLabel = winningSelection
+      ? OUTCOME_LABELS[winningSelection as MatchOutcome] ?? winningSelection
+      : null;
+    return { isCorrect: false, winningLabel };
+  }
+
+  if (!winningSelection) {
+    return { isCorrect: null, winningLabel: null };
+  }
+
+  const isCorrect = prediction.selection === winningSelection;
+  return {
+    isCorrect,
+    winningLabel:
+      OUTCOME_LABELS[winningSelection as MatchOutcome] ?? winningSelection,
+  };
+}
+
+export function isMatchFinishedForBet(
+  prediction: Pick<Doc<"predictions">, "status">,
+  matchStatus?: string,
+): boolean {
+  if (
+    prediction.status === "won" ||
+    prediction.status === "lost" ||
+    prediction.status === "settled"
+  ) {
+    return true;
+  }
+
+  return matchStatus?.toLowerCase() === MatchStatus.Finished;
 }

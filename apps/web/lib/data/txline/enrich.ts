@@ -1,6 +1,7 @@
 import { TxlineClient } from "@goalaxify/txline-sdk/client";
 
 import type { FixtureCatalogEntry } from "@/lib/constants/fixtures";
+import { getBoothStatusLabel } from "@/lib/constants/match-copy";
 import type { FeaturedMatchView } from "@/lib/data/types";
 import { mapTxlineOddsSnapshot } from "@/lib/data/txline/map-odds";
 import {
@@ -10,9 +11,13 @@ import {
 } from "@/lib/data/txline/map-fixtures";
 import { mapTxlineScoresStatus } from "@/lib/data/txline/map-scores";
 import { OddsSource } from "@/lib/enums";
-import { deriveMatchStatus, findLiveMatch } from "@/lib/utils/match";
+import {
+  deriveMatchStatus,
+  findLiveMatch,
+  isBoothOpenForMatch,
+} from "@/lib/utils/match";
 
-function getTxlineCredentials() {
+export function getTxlineCredentials() {
   const guestJwt = process.env.TXLINE_GUEST_JWT;
   const apiToken = process.env.TXLINE_API_TOKEN;
   if (!guestJwt || !apiToken) return null;
@@ -31,6 +36,9 @@ function catalogToMatchView(
     throw new Error("Cannot render match view without live market odds");
   }
 
+  const status = deriveMatchStatus(fixture.kickoffAt, fixture.status);
+  const boothOpen = isBoothOpenForMatch(fixture.kickoffAt, status);
+
   return {
     ref: fixture.ref,
     fixtureId: fixture.fixtureId,
@@ -38,9 +46,10 @@ function catalogToMatchView(
     away: fixture.away,
     venue: fixture.venue,
     kickoffAt: fixture.kickoffAt,
-    status: deriveMatchStatus(fixture.kickoffAt, fixture.status),
+    status,
     round: fixture.round,
-    boothOpen: fixture.boothOpen,
+    boothOpen,
+    boothStatusLabel: getBoothStatusLabel(boothOpen),
     market: fixture.marketOdds,
     crowd: fixture.crowdOdds ?? null,
     marketDeltaPct: null,

@@ -52,6 +52,9 @@ const locale = {
     crowdLabel: "Goalaxify 크라우드",
     crowdHint: "팬들이 돈을 거는 곳",
     boothOpen: "음성 Booth 개방",
+    boothClosed: "베팅 마감 — 경기 진행 중",
+    manageYourBet: "베팅 관리",
+    betPlacedInPlay: "베팅은 경기 종료까지 잠깁니다",
     talkYourBet: "베팅을 말하세요",
     oddsHelp:
       "승, 무, 패를 선택하세요 — 간단한 확률로 표시, 베팅 전문 용어 없음.",
@@ -69,6 +72,9 @@ const locale = {
       "아나운서와 대화하여 전액 환불 취소 또는 베팅 교체가 가능합니다. 새 스테이크 서명이 필요할 때만 Phantom이 열립니다.",
     stakeHint:
       "경기장 아나운서에게 예측을 말하세요. 음성으로 확인 — 동의하면 앱이 자동으로 스테이크합니다(Phantom에서 서명).",
+    lockedTitle: "Booth 마감",
+    lockedDescription:
+      "경기가 시작되었습니다. 베팅은 종료까지 잠금 — 신규 베팅 및 변경 불가.",
     status: {
       ready: "준비됨",
       connecting: "연결 중…",
@@ -102,11 +108,24 @@ const locale = {
     claiming: "수령 중…",
     manageByVoice: "음성으로 관리",
     matchLocked: "경기 시작 — 변경 잠김",
+    matchStarts: "경기 시작",
+    finalScore: "최종 스코어",
+    scorePending: "스코어 대기 중",
+    settling: "베팅 정산 중…",
+    pickCorrect: "예측이 맞았습니다",
+    pickMissedPrefix: "예측이 빗나갔습니다 — 결과는",
+    pickMissed: "예측이 빗나갔습니다 — 결과는 {{outcome}}",
+    claimHint: "아래를 눌러 Solana 지갑으로 상금을 받으세요.",
+    viewClaimTx: "수령 거래 보기",
     status: {
       open: { label: "열림", description: "킥오프 전 음성으로 관리하려면 탭" },
       locked: { label: "진행 중", description: "경기 시작 — 결과 대기" },
-      won: { label: "승리", description: "상금을 수령하세요" },
-      lost: { label: "패배", description: "다음 경기에 행운을" },
+      lockedFinished: {
+        label: "경기 종료",
+        description: "경기가 끝났습니다 — 베팅 정산 중",
+      },
+      won: { label: "승리", description: "예측이 맞았습니다 — 상금을 수령하세요" },
+      lost: { label: "패배", description: "예측이 최종 결과와 맞지 않았습니다" },
       settled: { label: "정산됨", description: "온체인에서 상금 수령 완료" },
       cancelled: { label: "취소됨", description: "킥오프 전 전액 환불" },
       replaced: { label: "교체됨", description: "이 경기의 더 새로운 베팅으로 대체됨" },

@@ -52,6 +52,9 @@ const locale = {
     crowdLabel: "جمهور Goalaxify",
     crowdHint: "أين يضع المعجبون أموالهم",
     boothOpen: "الـ Booth الصوتي مفتوح",
+    boothClosed: "الرهان مغلق — المباراة جارية",
+    manageYourBet: "إدارة رهانك",
+    betPlacedInPlay: "رهانك مقفل حتى نهاية المباراة",
     talkYourBet: "قل رهانك",
     oddsHelp:
       "اختر الفائز، التعادل، أو الضيف — باحتمالات بسيطة، دون مصطلحات مراهنة.",
@@ -69,6 +72,9 @@ const locale = {
       "تحدث مع المذيع للإلغاء مع استرداد كامل أو استبدال رهانك. يفتح Phantom فقط عند الحاجة لتوقيع رهان جديد.",
     stakeHint:
       "قل توقعك لمذيع الملعب. أكّد بالصوت — بمجرد الموافقة، يراهن التطبيق تلقائياً (يفتح Phantom للتوقيع).",
+    lockedTitle: "Booth مغلق",
+    lockedDescription:
+      "بدأت المباراة. الرهانات مقفلة حتى النهاية — لا رهانات جديدة ولا تغييرات.",
     status: {
       ready: "جاهز",
       connecting: "جارٍ الاتصال…",
@@ -102,11 +108,24 @@ const locale = {
     claiming: "جارٍ المطالبة…",
     manageByVoice: "إدارة بالصوت",
     matchLocked: "بدأت المباراة — التغييرات مقفلة",
+    matchStarts: "بداية المباراة",
+    finalScore: "النتيجة النهائية",
+    scorePending: "النتيجة قيد الانتظار",
+    settling: "جارٍ تسوية رهانك…",
+    pickCorrect: "توقعك كان صحيحاً",
+    pickMissedPrefix: "توقعك أخطأ — النتيجة كانت",
+    pickMissed: "توقعك أخطأ — النتيجة كانت {{outcome}}",
+    claimHint: "اضغط أدناه لتحويل الأرباح إلى محفظتك على Solana.",
+    viewClaimTx: "عرض معاملة المطالبة",
     status: {
       open: { label: "مفتوح", description: "اضغط للإدارة بالصوت قبل البداية" },
       locked: { label: "جارية", description: "بدأت المباراة — في انتظار النتيجة" },
-      won: { label: "فوز", description: "اطلب أرباحك" },
-      lost: { label: "خسارة", description: "حظاً أوفر في المرة القادمة" },
+      lockedFinished: {
+        label: "نهاية المباراة",
+        description: "انتهت المباراة — جارٍ تسوية رهانك",
+      },
+      won: { label: "فوز", description: "توقعك كان صحيحاً — اطلب أرباحك" },
+      lost: { label: "خسارة", description: "توقعك لم يطابق النتيجة النهائية" },
       settled: { label: "مسوّى", description: "تمت المطالبة بالأرباح على السلسلة" },
       cancelled: { label: "ملغى", description: "استرداد كامل قبل البداية" },
       replaced: { label: "مستبدل", description: "استُبدل برهان أحدث على هذه المباراة" },

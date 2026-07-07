@@ -52,6 +52,9 @@ const locale = {
     crowdLabel: "Folla Goalaxify",
     crowdHint: "Dove i fan stanno mettendo i soldi",
     boothOpen: "Booth vocale aperto",
+    boothClosed: "Scommesse chiuse — partita in corso",
+    manageYourBet: "Gestisci la tua scommessa",
+    betPlacedInPlay: "La tua scommessa è bloccata fino al fischio finale",
     talkYourBet: "Dì la tua scommessa",
     oddsHelp:
       "Scegli chi vince, pareggio o trasferta — in probabilità semplici, senza gergo.",
@@ -69,6 +72,9 @@ const locale = {
       "Parla con lo speaker per annullare con rimborso completo o sostituire la scommessa. Phantom si apre solo per firmare un nuovo stake.",
     stakeHint:
       "Dì la tua previsione allo speaker dello stadio. Conferma a voce — una volta d'accordo, l'app punta automaticamente (Phantom si apre per firmare).",
+    lockedTitle: "Booth chiuso",
+    lockedDescription:
+      "La partita è iniziata. Le scommesse sono bloccate fino al fischio finale — niente nuove puntate o modifiche.",
     status: {
       ready: "Pronto",
       connecting: "Connessione…",
@@ -102,11 +108,24 @@ const locale = {
     claiming: "Riscossione…",
     manageByVoice: "Gestisci a voce",
     matchLocked: "Partita iniziata — modifiche bloccate",
+    matchStarts: "Inizio partita",
+    finalScore: "Risultato finale",
+    scorePending: "Punteggio in attesa",
+    settling: "Regolazione della scommessa…",
+    pickCorrect: "La tua previsione era corretta",
+    pickMissedPrefix: "Previsione errata — risultato:",
+    pickMissed: "Previsione errata — risultato: {{outcome}}",
+    claimHint: "Tocca sotto per trasferire le vincite al tuo wallet Solana.",
+    viewClaimTx: "Vedi tx di riscossione",
     status: {
       open: { label: "Aperta", description: "Tocca per gestire a voce prima del fischio" },
       locked: { label: "In corso", description: "Partita iniziata — in attesa del risultato" },
-      won: { label: "Vinta", description: "Riscuoti le tue vincite" },
-      lost: { label: "Persa", description: "Meglio fortuna la prossima volta" },
+      lockedFinished: {
+        label: "Fine partita",
+        description: "Partita terminata — regolazione in corso",
+      },
+      won: { label: "Vinta", description: "Previsione corretta — riscuoti le vincite" },
+      lost: { label: "Persa", description: "La previsione non corrisponde al risultato finale" },
       settled: { label: "Regolata", description: "Vincite riscosse on-chain" },
       cancelled: { label: "Annullata", description: "Stake rimborsato prima del fischio" },
       replaced: { label: "Sostituita", description: "Sostituita da una scommessa più recente" },

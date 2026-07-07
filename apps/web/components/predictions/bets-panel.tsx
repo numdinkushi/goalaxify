@@ -6,10 +6,15 @@ import { BetCard } from "@/components/predictions/bet-card";
 import { Card, CardContent } from "@/components/ui/card";
 import { useClaimWinnings } from "@/hooks/use-claim-winnings";
 import {
+  mergeFixtureMeta,
+  useFixtureResults,
+} from "@/hooks/use-fixture-results";
+import {
   resolveFixtureMetaForPrediction,
   useFixtureKickoffs,
 } from "@/hooks/use-fixture-kickoffs";
 import { usePredictions } from "@/hooks/use-predictions";
+import { useSyncSettlements } from "@/hooks/use-sync-settlements";
 import { useWalletSession } from "@/hooks/use-wallet-session";
 
 export function BetsPanel() {
@@ -17,13 +22,18 @@ export function BetsPanel() {
   const { predictions, loading } = usePredictions();
   const { kickoffByFixtureId, kickoffByTeams, loading: fixturesLoading } =
     useFixtureKickoffs();
+  const fixtureIds = predictions.map((prediction) => prediction.fixtureId);
+  const { resultByFixtureId, loading: resultsLoading } =
+    useFixtureResults(fixtureIds);
   const { claimPrediction, claimingId } = useClaimWinnings();
+
+  useSyncSettlements(predictions);
 
   if (!isConnected || !walletPubkey) {
     return null;
   }
 
-  const isLoading = loading || fixturesLoading;
+  const isLoading = loading || fixturesLoading || resultsLoading;
 
   return (
     <Card className="border-border/80">
@@ -48,10 +58,13 @@ export function BetsPanel() {
               <BetCard
                 key={prediction._id}
                 prediction={prediction}
-                fixtureMeta={resolveFixtureMetaForPrediction(
-                  prediction,
-                  kickoffByFixtureId,
-                  kickoffByTeams,
+                fixtureMeta={mergeFixtureMeta(
+                  resolveFixtureMetaForPrediction(
+                    prediction,
+                    kickoffByFixtureId,
+                    kickoffByTeams,
+                  ),
+                  resultByFixtureId.get(prediction.fixtureId),
                 )}
                 claiming={claimingId === prediction._id}
                 onClaim={
