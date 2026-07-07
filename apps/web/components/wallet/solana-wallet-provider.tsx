@@ -43,6 +43,6 @@ export function SolanaWalletProvider({ children }: SolanaWalletProviderProps) {
           <GoalaxifyWalletModalProvider>{children}</GoalaxifyWalletModalProvider>
         </WalletConnectProvider>
       </WalletProvider>
-    </ConnectionProvider>
+    </ConnectionProvider> 
   );
 }
