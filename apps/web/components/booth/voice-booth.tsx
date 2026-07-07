@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Mic, MicOff, PhoneOff, Radio } from "lucide-react";
+import { useEffect } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -11,11 +12,13 @@ import { useWalletSession } from "@/hooks/use-wallet-session";
 import type { BoothContext } from "@/lib/data/types";
 import { BoothCallStatus } from "@/lib/enums";
 import { AppRoute } from "@/lib/enums";
-import { formatMatchTitle } from "@/lib/utils/format";
+import { formatKickoffTime, formatMatchTitle } from "@/lib/utils/format";
+import { formatScheduleDayLabel } from "@/lib/utils/schedule";
 import { cn } from "@/lib/utils";
 
 type VoiceBoothProps = {
   context: BoothContext;
+  onSessionActiveChange?: (locked: boolean) => void;
 };
 
 const STATUS_LABELS: Record<BoothCallStatus, string> = {
@@ -26,12 +29,19 @@ const STATUS_LABELS: Record<BoothCallStatus, string> = {
   [BoothCallStatus.Error]: "Unavailable",
 };
 
-export function VoiceBooth({ context }: VoiceBoothProps) {
+export function VoiceBooth({ context, onSessionActiveChange }: VoiceBoothProps) {
   const booth = useVapiBooth({ context });
   const { isConnected, walletPubkey } = useWalletSession();
+  const kickoffLabel = context.kickoffAt
+    ? `${formatScheduleDayLabel(context.kickoffAt)} · ${formatKickoffTime(context.kickoffAt)}`
+    : null;
+
+  useEffect(() => {
+    onSessionActiveChange?.(booth.isActive || booth.isConnecting);
+  }, [booth.isActive, booth.isConnecting, onSessionActiveChange]);
 
   return (
-    <section className="space-y-4">
+    <section className="space-y-3">
       <Card className="overflow-hidden border-border/80">
         <div className="h-1.5 bg-gradient-to-r from-brand-coral to-brand-pastel-pink" />
         <CardContent className="space-y-5 p-6">
@@ -49,6 +59,9 @@ export function VoiceBooth({ context }: VoiceBoothProps) {
                 {formatMatchTitle(context.homeTeam, context.awayTeam)}
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">{context.round}</p>
+              {kickoffLabel ? (
+                <p className="mt-1 text-xs text-muted-foreground">{kickoffLabel}</p>
+              ) : null}
             </div>
             <Badge variant={booth.isActive ? "live" : "outline"}>
               {STATUS_LABELS[booth.status]}
