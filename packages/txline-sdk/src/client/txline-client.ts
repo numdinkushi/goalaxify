@@ -36,6 +36,7 @@ export class TxlineClient {
   async getJson<T>(path: string, init?: RequestInit): Promise<T> {
     const response = await fetch(`${this.config.apiBaseUrl}${path}`, {
       ...init,
+      cache: "no-store",
       headers: {
         ...this.authHeaders(),
         ...(init?.headers ?? {}),

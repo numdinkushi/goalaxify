@@ -1,6 +1,8 @@
 import type { BoothContext } from "@/lib/data/types";
 import { getBoothAssistantId, getPublicVapiToken } from "@/lib/vapi/config";
 import { parseVapiError } from "@/lib/vapi/parse-error";
+import { formatKickoffTime } from "@/lib/utils/format";
+import { formatScheduleDayLabel } from "@/lib/utils/schedule";
 
 export type BoothCallConfig = {
   context: BoothContext;
@@ -85,13 +87,17 @@ export class VapiBoothService {
     }
 
     const { context } = config;
+    const kickoffHint = context.kickoffAt
+      ? ` Kickoff is ${formatScheduleDayLabel(context.kickoffAt)} at ${formatKickoffTime(context.kickoffAt)}.`
+      : "";
     const assistantOverrides = {
-      firstMessage: `Welcome to the Goalaxify booth! ${context.homeTeam} vs ${context.awayTeam} — ${context.round}. Tell me your match prediction and stake.`,
+      firstMessage: `Welcome to the Goalaxify booth! ${context.homeTeam} vs ${context.awayTeam} — ${context.round}.${kickoffHint} Tell me your match prediction and stake.`,
       metadata: {
         fixtureId: context.fixtureId,
         homeTeam: context.homeTeam,
         awayTeam: context.awayTeam,
         round: context.round,
+        kickoffAt: context.kickoffAt,
         market: context.market,
         app: "goalaxify",
       },

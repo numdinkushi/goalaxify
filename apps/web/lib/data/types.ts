@@ -14,8 +14,8 @@ export type FeaturedMatchView = {
   round: string;
   boothOpen: boolean;
   market: ThreeWayOdds;
-  crowd: ThreeWayOdds;
-  marketDeltaPct: number;
+  crowd: ThreeWayOdds | null;
+  marketDeltaPct: number | null;
   oddsSource: OddsSource;
 };
 
@@ -47,6 +47,7 @@ export type BoothContext = {
   homeFlag: string;
   awayFlag: string;
   round: string;
+  kickoffAt?: string;
   market?: PredictionMarket;
 };
 

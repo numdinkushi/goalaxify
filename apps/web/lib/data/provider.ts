@@ -7,10 +7,11 @@ import type {
 } from "@/lib/data/types";
 
 export interface IDataProvider {
-  getFeaturedMatch(): Promise<FeaturedMatchView>;
+  getFeaturedMatch(): Promise<FeaturedMatchView | null>;
+  getUpcomingMatches(): Promise<FeaturedMatchView[]>;
   getActionCards(): Promise<ActionCardView[]>;
   getMoments(fixtureId?: number): Promise<MomentView[]>;
-  getBoothContext(): Promise<BoothContext>;
+  getBoothContext(fixtureId?: number): Promise<BoothContext>;
   getSettlementBadge(): Promise<SettlementBadgeView>;
   listFixtures(): Promise<FeaturedMatchView[]>;
 }
