@@ -268,6 +268,7 @@ export function VoiceBooth({
   };
 
   const resetSession = () => {
+    autoStartScheduledRef.current = false;
     releaseBoothAutoStart(autoStartKey);
     setActionPhase("idle");
     setActionError(null);
@@ -278,11 +279,17 @@ export function VoiceBooth({
   };
 
   useEffect(() => {
-    if (booth.error) {
-      setActionPhase("idle");
-      setActionError(booth.error);
+    if (!booth.error) {
+      return;
     }
+
+    setActionPhase("idle");
+    setActionError((current) => current ?? booth.error);
   }, [booth.error]);
+
+  const connectionError = booth.error;
+  const actionOnlyError =
+    actionError && actionError !== connectionError ? actionError : null;
 
   const summaryPhase: VoiceActionPhase =
     booth.isActive || booth.isConnecting
@@ -298,7 +305,7 @@ export function VoiceBooth({
           actionType={actionType}
           draft={pendingDraft}
           manageBet={manageBet}
-          error={actionError ?? undefined}
+          error={actionOnlyError ?? undefined}
         />
 
         <Card className="overflow-hidden border-border/80">
