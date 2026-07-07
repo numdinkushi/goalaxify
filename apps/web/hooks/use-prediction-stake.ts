@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import type { Id } from "@goalaxify/convex/_generated/dataModel";
 import * as anchor from "@coral-xyz/anchor";
 import { useMutation } from "convex/react";
 import type { PredictionDraft } from "@goalaxify/domain";
@@ -22,6 +23,10 @@ import {
   promptWalletTransaction,
   type PreparedBlockhash,
 } from "@/lib/wallet/send-transaction";
+import {
+  getInsufficientStakeMessage,
+  parseStakeTransactionError,
+} from "@/lib/wallet/stake-balance";
 
 type PreparedBlockhashRef = PreparedBlockhash | null;
 
@@ -68,7 +73,10 @@ export function usePredictionStake() {
   }, [connection]);
 
   const submitStake = useCallback(
-    async (draft: PredictionDraft) => {
+    async (
+      draft: PredictionDraft,
+      options?: { supersedesPredictionId?: Id<"predictions"> },
+    ) => {
       if (!wallet.publicKey) {
         throw new Error("Connect your wallet before staking");
       }
@@ -127,6 +135,15 @@ export function usePredictionStake() {
             );
           }
 
+          const balanceLamports = await connection.getBalance(wallet.publicKey);
+          const insufficientMessage = getInsufficientStakeMessage(
+            draft.stake,
+            balanceLamports,
+          );
+          if (insufficientMessage) {
+            throw new Error(insufficientMessage);
+          }
+
           if (!isBlockhashFresh(preparedBlockhashRef.current)) {
             throw new Error(
               "Transaction preparation expired. Wait a moment, then click Confirm again.",
@@ -178,16 +195,18 @@ export function usePredictionStake() {
           termsHash,
           estimatedReturn: draft.estimatedReturn,
           vapiCallId: draft.vapiCallId,
+          supersedesPredictionId: options?.supersedesPredictionId,
         });
 
         appToast.genericSuccess("Prediction staked on-chain");
         return intentTxSig;
       } catch (cause) {
-        const message =
-          cause instanceof Error ? cause.message : "Failed to stake prediction";
+        const message = parseStakeTransactionError(cause, {
+          intendedStakeSol: draft.stake,
+        });
         setError(message);
         appToast.genericError(message);
-        throw cause;
+        throw new Error(message);
       } finally {
         setIsStaking(false);
       }

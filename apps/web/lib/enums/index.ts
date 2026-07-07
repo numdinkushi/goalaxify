@@ -50,3 +50,14 @@ export enum BoothCallStatus {
   Ended = "ended",
   Error = "error",
 }
+
+export enum BoothSessionMode {
+  Stake = "stake",
+  Manage = "manage",
+}
+
+export enum VoiceActionType {
+  Stake = "stake",
+  Cancel = "cancel",
+  Replace = "replace",
+}

@@ -20,6 +20,8 @@ export const predictionStatusValidator = v.union(
   v.literal("won"),
   v.literal("lost"),
   v.literal("settled"),
+  v.literal("cancelled"),
+  v.literal("replaced"),
 );
 
 export const predictionMarketValidator = v.union(
@@ -99,6 +101,8 @@ export default defineSchema({
     payoutAmount: v.optional(v.number()),
     payoutBaseUnits: v.optional(v.string()),
     vapiCallId: v.optional(v.string()),
+    manageCount: v.optional(v.number()),
+    supersedesPredictionId: v.optional(v.id("predictions")),
     createdAt: v.number(),
     updatedAt: v.number(),
     resolvedAt: v.optional(v.number()),

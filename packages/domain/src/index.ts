@@ -10,7 +10,14 @@ export type LanguageCode =
   | "ko"
   | "ar";
 
-export type PredictionStatus = "open" | "locked" | "won" | "lost" | "settled";
+export type PredictionStatus =
+  | "open"
+  | "locked"
+  | "won"
+  | "lost"
+  | "settled"
+  | "cancelled"
+  | "replaced";
 
 export type PredictionMarket = "match_winner" | "over_under" | "both_teams_score";
 
