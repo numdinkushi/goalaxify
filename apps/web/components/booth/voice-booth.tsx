@@ -17,6 +17,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useCancelPrediction } from "@/hooks/use-cancel-prediction";
 import { usePredictionStake } from "@/hooks/use-prediction-stake";
+import { useTranslation } from "@/hooks/use-translation";
 import { useVapiBooth } from "@/hooks/use-vapi-booth";
 import { useWalletBalance } from "@/hooks/use-wallet-balance";
 import { useWalletSession } from "@/hooks/use-wallet-session";
@@ -57,20 +58,13 @@ type VoiceBoothProps = {
   onSessionActiveChange?: (locked: boolean) => void;
 };
 
-const STATUS_LABELS: Record<BoothCallStatus, string> = {
-  [BoothCallStatus.Idle]: "Ready",
-  [BoothCallStatus.Connecting]: "Connecting…",
-  [BoothCallStatus.Active]: "Live",
-  [BoothCallStatus.Ended]: "Session ended",
-  [BoothCallStatus.Error]: "Unavailable",
-};
-
 export function VoiceBooth({
   context,
   manageBet,
   autoStartSession = false,
   onSessionActiveChange,
 }: VoiceBoothProps) {
+  const { t } = useTranslation();
   const { connection } = useConnection();
   const { isConnected, walletPubkey } = useWalletSession();
   const { refresh: refreshWalletBalance } = useWalletBalance();
@@ -89,6 +83,14 @@ export function VoiceBooth({
     fixtureId: context.fixtureId,
     managePredictionId: manageBet?.predictionId,
   });
+
+  const statusLabels: Record<BoothCallStatus, string> = {
+    [BoothCallStatus.Idle]: t("booth.status.ready"),
+    [BoothCallStatus.Connecting]: t("booth.status.connecting"),
+    [BoothCallStatus.Active]: t("booth.status.live"),
+    [BoothCallStatus.Ended]: t("booth.status.ended"),
+    [BoothCallStatus.Error]: t("booth.status.unavailable"),
+  };
 
   const executeVoiceAction = useCallback(
     async (action: BoothToolAction) => {
@@ -371,11 +373,13 @@ export function VoiceBooth({
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold tracking-[0.18em] text-muted-foreground uppercase">
-                  Voice booth
+                  {t("booth.voiceTitle")}
                 </p>
                 <div className="mt-2 flex items-center gap-2 text-xl">
                   <span aria-hidden>{context.homeFlag}</span>
-                  <span className="text-sm font-semibold text-muted-foreground">vs</span>
+                  <span className="text-sm font-semibold text-muted-foreground">
+                    {t("match.vs")}
+                  </span>
                   <span aria-hidden>{context.awayFlag}</span>
                 </div>
                 <h2 className="mt-2 text-xl font-bold">
@@ -389,31 +393,29 @@ export function VoiceBooth({
               <Badge variant={booth.isActive ? "live" : "outline"}>
                 {isBusy
                   ? actionPhase === "signing"
-                    ? "Signing…"
+                    ? t("booth.status.signing")
                     : actionPhase === "refunding"
-                      ? "Refunding…"
-                      : "Processing…"
-                  : STATUS_LABELS[booth.status]}
+                      ? t("booth.status.refunding")
+                      : t("booth.status.processing")
+                  : statusLabels[booth.status]}
               </Badge>
             </div>
 
             <p className="text-sm leading-relaxed text-muted-foreground">
-              {manageBet
-                ? "Talk to the announcer to cancel for a full refund or replace your bet. Voice confirmation replaces the review step — Phantom opens only when a new stake needs signing."
-                : "Talk your prediction to the stadium announcer. Confirm by voice — once you agree, the app stakes automatically (Phantom opens to sign)."}
+              {manageBet ? t("booth.manageHint") : t("booth.stakeHint")}
             </p>
 
             {actionPhase === "refunding" && (
               <div className="flex items-center gap-2 rounded-xl border border-border/80 bg-muted/40 px-4 py-3 text-sm">
                 <Loader2 className="size-4 animate-spin text-brand-coral" />
-                Refunding your previous stake from the pot…
+                {t("booth.refundingMessage")}
               </div>
             )}
 
             {actionPhase === "signing" && (
               <div className="flex items-center gap-2 rounded-xl border border-border/80 bg-muted/40 px-4 py-3 text-sm">
                 <Loader2 className="size-4 animate-spin text-brand-coral" />
-                Approve in Phantom to sign your stake…
+                {t("booth.signingMessage")}
               </div>
             )}
 
@@ -421,7 +423,7 @@ export function VoiceBooth({
               <div className="flex items-start gap-2 rounded-xl border border-brand-mint/30 bg-brand-mint/10 px-4 py-3 text-sm">
                 <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-brand-mint" />
                 <div>
-                  <p className="font-medium">Done</p>
+                  <p className="font-medium">{t("booth.done")}</p>
                   <p className="text-muted-foreground">{successMessage}</p>
                 </div>
               </div>
@@ -455,7 +457,7 @@ export function VoiceBooth({
                   disabled={!booth.vapiEnabled || !isConnected}
                 >
                   <Mic className="size-4" />
-                  {manageBet ? "Manage bet by voice" : "Start voice session"}
+                  {manageBet ? t("booth.manageByVoice") : t("booth.startSession")}
                 </Button>
               )}
 
@@ -467,7 +469,7 @@ export function VoiceBooth({
                     ) : (
                       <Mic className="size-4" />
                     )}
-                    {booth.isMuted ? "Unmute" : "Mute"}
+                    {booth.isMuted ? t("booth.unmute") : t("booth.mute")}
                   </Button>
                   <Button
                     variant="outline"
@@ -475,28 +477,28 @@ export function VoiceBooth({
                     onClick={booth.endSession}
                   >
                     <PhoneOff className="size-4" />
-                    End session
+                    {t("booth.endSession")}
                   </Button>
                 </>
               )}
 
               {booth.status === BoothCallStatus.Ended && !isBusy && (
                 <Button variant="outline" onClick={resetSession}>
-                  New session
+                  {t("booth.newSession")}
                 </Button>
               )}
             </div>
 
             {walletPubkey && (
               <p className="text-xs text-muted-foreground">
-                Linked wallet:{" "}
+                {t("booth.linkedWallet")}{" "}
                 <span className="font-mono">{walletPubkey}</span>
               </p>
             )}
 
             {booth.callId && (
               <p className="text-xs text-muted-foreground">
-                Call ID: <span className="font-mono">{booth.callId}</span>
+                {t("booth.callId")} <span className="font-mono">{booth.callId}</span>
               </p>
             )}
           </CardContent>
@@ -507,7 +509,7 @@ export function VoiceBooth({
           className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
         >
           <Radio className="size-4" />
-          View live moments
+          {t("booth.viewLiveMoments")}
         </Link>
       </section>
     </>

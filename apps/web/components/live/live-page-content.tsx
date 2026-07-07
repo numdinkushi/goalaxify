@@ -1,6 +1,6 @@
 import { LiveEmptyState } from "@/components/live/live-empty-state";
+import { LiveFeedUnavailable } from "@/components/live/live-feed-unavailable";
 import { MomentFeed } from "@/components/live/moment-feed";
-import { MatchDataUnavailable } from "@/components/match/match-data-unavailable";
 import { AppRoute } from "@/lib/enums";
 import { getDataProvider } from "@/lib/data";
 import { findLiveMatch } from "@/lib/utils/match";
@@ -13,12 +13,7 @@ export async function LivePageContent() {
   ]);
 
   if (upcomingMatches.length === 0) {
-    return (
-      <MatchDataUnavailable
-        title="Live feed unavailable"
-        description="We need active TxLINE fixture data before the live pitch can open. Check back when matches are scheduled or in play."
-      />
-    );
+    return <LiveFeedUnavailable />;
   }
 
   const liveMatch = findLiveMatch(upcomingMatches);

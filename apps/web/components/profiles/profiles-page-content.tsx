@@ -11,23 +11,25 @@ import { PageHeader } from "@/components/layout/page-header";
 import { WalletGate } from "@/components/wallet/wallet-gate";
 import { useProfileTab } from "@/hooks/use-profile-tab";
 import { useProfileView } from "@/hooks/use-profile-view";
+import { useTranslation } from "@/hooks/use-translation";
 import { ProfileTab } from "@/lib/enums";
 
 function ProfilesPageInner() {
   const { isConnected } = useProfileView();
   const { activeTab, setActiveTab } = useProfileTab();
+  const { t } = useTranslation();
 
   if (!isConnected) {
     return (
       <main className="flex flex-1 flex-col gap-6 px-6 pt-4 pb-8">
         <PageHeader
-          eyebrow="Identity"
-          title="Profile"
-          description="Connect your wallet to manage your profile, wallet, and bets."
+          eyebrow={t("profiles.eyebrow")}
+          title={t("profiles.title")}
+          description={t("profiles.disconnectedDescription")}
         />
         <WalletGate
-          title="Connect to view your profile"
-          description="Your wallet address, username, avatar, balance, and bet history live here once you connect."
+          title={t("profiles.connectTitle")}
+          description={t("profiles.connectDescription")}
         >
           <div />
         </WalletGate>
@@ -38,9 +40,9 @@ function ProfilesPageInner() {
   return (
     <main className="flex flex-1 flex-col gap-6 px-6 pt-4 pb-8">
       <PageHeader
-        eyebrow="Identity"
-        title="Profile"
-        description="Manage your identity, wallet, and on-chain bets in one place."
+        eyebrow={t("profiles.eyebrow")}
+        title={t("profiles.title")}
+        description={t("profiles.description")}
       />
 
       <ProfileTabBar activeTab={activeTab} onTabChange={setActiveTab} />

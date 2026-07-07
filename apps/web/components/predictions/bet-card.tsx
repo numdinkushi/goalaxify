@@ -13,14 +13,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { OUTCOME_LABELS } from "@/lib/data/types";
 import { AppRoute } from "@/lib/enums";
+import { useTranslation } from "@/hooks/use-translation";
 import { getSolanaNetwork } from "@/lib/solana/config";
 import {
   canManageBet,
   formatBetKickoff,
-  getBetStatusMeta,
   isMatchStarted,
   resolveBetKickoff,
   resolveBetPayout,
+  type BetStatusMeta,
 } from "@/lib/utils/bet-display";
 import { formatMatchTitle } from "@/lib/utils/format";
 import { formatTokenAmount } from "@/lib/utils/prediction";
@@ -35,7 +36,7 @@ type BetCardProps = {
 };
 
 const STATUS_BADGE: Record<
-  ReturnType<typeof getBetStatusMeta>["tone"],
+  BetStatusMeta["tone"],
   "outline" | "live" | "mint" | "secondary" | "default" | "accent"
 > = {
   open: "outline",
@@ -47,6 +48,33 @@ const STATUS_BADGE: Record<
   replaced: "accent",
 };
 
+const BET_STATUS_KEY_MAP = {
+  open: "bets.status.open",
+  locked: "bets.status.locked",
+  won: "bets.status.won",
+  lost: "bets.status.lost",
+  settled: "bets.status.settled",
+  cancelled: "bets.status.cancelled",
+  replaced: "bets.status.replaced",
+} as const;
+
+function getTranslatedBetStatus(
+  statusKey: keyof typeof BET_STATUS_KEY_MAP,
+  t: (key: string) => string,
+): BetStatusMeta {
+  const key = BET_STATUS_KEY_MAP[statusKey];
+  return {
+    label: t(`${key}.label`),
+    description: t(`${key}.description`),
+    tone:
+      statusKey === "open"
+        ? "open"
+        : statusKey === "locked"
+          ? "pending"
+          : statusKey,
+  };
+}
+
 export function BetCard({
   prediction,
   fixtureMeta,
@@ -54,6 +82,7 @@ export function BetCard({
   claiming = false,
 }: BetCardProps) {
   const router = useRouter();
+  const { t } = useTranslation();
   const kickoff = resolveBetKickoff(prediction, fixtureMeta);
   const kickoffDisplay = formatBetKickoff(kickoff.kickoffAt);
   const matchStarted = isMatchStarted(
@@ -66,7 +95,10 @@ export function BetCard({
     kickoff.kickoffAt,
     kickoff.matchStatus,
   );
-  const status = getBetStatusMeta(prediction.status);
+  const status = getTranslatedBetStatus(
+    prediction.status as keyof typeof BET_STATUS_KEY_MAP,
+    t,
+  );
   const payout = resolveBetPayout(prediction);
   const network = getSolanaNetwork();
   const explorerCluster =
@@ -90,7 +122,7 @@ export function BetCard({
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <div className="rounded-xl bg-muted/40 p-3">
-          <p className="text-xs text-muted-foreground">Your pick</p>
+          <p className="text-xs text-muted-foreground">{t("bets.yourPick")}</p>
           <p className="mt-1 font-medium">
             {OUTCOME_LABELS[prediction.selection as MatchOutcome] ??
               prediction.selection}
@@ -98,7 +130,7 @@ export function BetCard({
         </div>
 
         <div className="rounded-xl bg-muted/40 p-3">
-          <p className="text-xs text-muted-foreground">Stake</p>
+          <p className="text-xs text-muted-foreground">{t("bets.stake")}</p>
           <p className="mt-1 font-medium tabular-nums">
             {formatTokenAmount(payout.stake)} {payout.token}
           </p>
@@ -108,10 +140,10 @@ export function BetCard({
           <p className="flex items-center gap-1 text-xs text-muted-foreground">
             <TrendingUp className="size-3.5" />
             {payout.isFinal && prediction.status !== "cancelled" && prediction.status !== "replaced"
-              ? "Result payout"
+              ? t("bets.resultPayout")
               : prediction.status === "cancelled" || prediction.status === "replaced"
-                ? "Refunded stake"
-                : "Potential win"}
+                ? t("bets.refundedStake")
+                : t("bets.potentialWin")}
           </p>
           <p className="mt-1 text-lg font-bold tabular-nums">
             {formatTokenAmount(payout.payout)} {payout.token}
@@ -142,7 +174,7 @@ export function BetCard({
           <p className="mt-1 font-medium">{kickoffDisplay.primary}</p>
           <p className="mt-0.5 text-xs text-muted-foreground">
             {matchStarted && prediction.status === "open"
-              ? "Match started — changes locked"
+              ? t("bets.matchLocked")
               : kickoffDisplay.secondary}
           </p>
         </div>
@@ -165,7 +197,7 @@ export function BetCard({
               onClaim();
             }}
           >
-            {claiming ? "Claiming…" : "Claim winnings"}
+            {claiming ? t("bets.claiming") : t("bets.claimWinnings")}
           </Button>
         ) : null}
 

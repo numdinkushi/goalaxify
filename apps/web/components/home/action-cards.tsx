@@ -9,12 +9,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import type { ActionCardView, SettlementBadgeView } from "@/lib/data/types";
 import { ProfileTab } from "@/lib/enums";
 import { profileTabHref } from "@/hooks/use-profile-tab";
+import { useTranslation } from "@/hooks/use-translation";
 import { useWalletSession } from "@/hooks/use-wallet-session";
 import { cn } from "@/lib/utils";
 
 const ICONS = {
   "enter-booth": Mic,
   "the-pitch": PlayCircle,
+} as const;
+
+const ACTION_KEYS = {
+  "enter-booth": "actionCards.enterBooth",
+  "the-pitch": "actionCards.thePitch",
 } as const;
 
 type ActionCardsProps = {
@@ -24,6 +30,7 @@ type ActionCardsProps = {
 
 export function ActionCards({ actions, settlement }: ActionCardsProps) {
   const { isConnected } = useWalletSession();
+  const { t } = useTranslation();
 
   return (
     <section className="space-y-3">
@@ -31,6 +38,7 @@ export function ActionCards({ actions, settlement }: ActionCardsProps) {
         const Icon = ICONS[action.id as keyof typeof ICONS] ?? Mic;
         const requiresWallet = action.id === "enter-booth";
         const blocked = requiresWallet && !isConnected;
+        const copyKey = ACTION_KEYS[action.id as keyof typeof ACTION_KEYS];
 
         return (
           <Card key={action.id} className="border-border/80">
@@ -41,13 +49,15 @@ export function ActionCards({ actions, settlement }: ActionCardsProps) {
 
               <div className="min-w-0 flex-1 space-y-3">
                 <div>
-                  <h3 className="text-base font-semibold">{action.title}</h3>
+                  <h3 className="text-base font-semibold">
+                    {copyKey ? t(`${copyKey}.title`) : action.title}
+                  </h3>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    {action.description}
+                    {copyKey ? t(`${copyKey}.description`) : action.description}
                   </p>
                   {blocked && (
                     <p className="mt-2 text-xs text-brand-pastel-pink">
-                      Connect your wallet to enter the voice booth.
+                      {t("actionCards.walletRequired")}
                     </p>
                   )}
                 </div>
@@ -68,7 +78,7 @@ export function ActionCards({ actions, settlement }: ActionCardsProps) {
                     )}
                     aria-disabled={action.disabled}
                   >
-                    {action.cta}
+                    {copyKey ? t(`${copyKey}.cta`) : action.cta}
                   </Link>
                 )}
               </div>
@@ -80,16 +90,21 @@ export function ActionCards({ actions, settlement }: ActionCardsProps) {
       <div className="flex items-center justify-center gap-2 rounded-2xl border border-dashed border-brand-dusty-blue/40 bg-brand-dusty-blue/10 px-4 py-3 text-sm text-muted-foreground">
         <ShieldCheck className="size-4 text-brand-dusty-blue" />
         <span>
-          {settlement.label}{" "}
-          <span className="font-medium text-foreground">{settlement.provider}</span>
+          {t("actionCards.settlement")}{" "}
+          <span className="font-medium text-foreground">
+            {t("actionCards.settlementProvider")}
+          </span>
         </span>
       </div>
 
       {!isConnected && (
         <p className="text-center text-xs text-muted-foreground">
-          Need a wallet?{" "}
-          <Link href={profileTabHref(ProfileTab.Wallet)} className="text-brand-coral hover:underline">
-            Set up in Profile
+          {t("actionCards.needWallet")}{" "}
+          <Link
+            href={profileTabHref(ProfileTab.Wallet)}
+            className="text-brand-coral hover:underline"
+          >
+            {t("actionCards.setupProfile")}
           </Link>
         </p>
       )}

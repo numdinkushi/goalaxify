@@ -1,0 +1,198 @@
+const locale = {
+  nav: {
+    home: "首页",
+    booth: "Booth",
+    live: "直播",
+    profiles: "个人资料",
+    leaderboard: "排行榜",
+    settings: "设置",
+  },
+  hero: {
+    worldCup: "2026 世界杯",
+    tagline: "说出你的投注。",
+    description:
+      "语音预测、实时进球和可验证结算 — 为想要感受比赛氛围的球迷打造。",
+  },
+  home: {
+    predictMatch: "预测比赛",
+    loadingFixtures: "正在加载世界杯赛程和赔率…",
+    noMatchDataTitle: "暂无比赛数据",
+    noMatchDataDescription:
+      "TxLINE 目前无法提供实时世界杯赛程和赔率。我们不会显示占位数据 — 请稍后再来。",
+    txlineNotConnectedTitle: "TxLINE 未连接",
+    txlineNotConnectedDescription:
+      "添加 TxLINE 凭据并运行设置以加载实时赛程和赔率。在此之前，此处不会显示任何内容。",
+  },
+  actionCards: {
+    enterBooth: {
+      title: "进入 Booth",
+      description: "向体育场播音员说出你的预测。",
+      cta: "开始语音会话",
+    },
+    thePitch: {
+      title: "球场",
+      description: "进球时刻、精彩片段和比赛实时脉搏。",
+      cta: "打开直播动态",
+    },
+    walletRequired: "连接钱包以进入语音 Booth。",
+    settlement: "在 Solana 上结算，",
+    settlementProvider: "TxLINE 证明",
+    needWallet: "需要钱包？",
+    setupProfile: "在个人资料中设置",
+  },
+  match: {
+    market: "市场",
+    crowd: "球迷",
+    vs: "vs",
+    isLiveNow: "正在直播",
+    openLive: "打开直播",
+    nextUp: "下一场",
+    txlineMarket: "TxLINE 市场",
+    marketHint: "博彩公司的看法",
+    crowdLabel: "Goalaxify 球迷",
+    crowdHint: "球迷资金去向",
+    boothOpen: "语音 Booth 已开放",
+    talkYourBet: "说出你的投注",
+    oddsHelp:
+      "选择胜、平或负 — 以简单概率显示，无博彩术语。",
+    oddsShifting: "赔率变动中",
+    oddsShiftOn: "于",
+  },
+  booth: {
+    eyebrow: "预测 Booth",
+    title: "说出你的投注",
+    description:
+      "选择任意即将进行的比赛，向体育场播音员说出市场、选项和投注金额。",
+    loading: "正在加载 Booth 比赛…",
+    voiceTitle: "语音 Booth",
+    manageHint:
+      "与播音员对话可全额退款取消或替换投注。语音确认替代审核步骤 — 仅在新投注需要签名时打开 Phantom。",
+    stakeHint:
+      "向体育场播音员说出你的预测。语音确认 — 同意后应用自动投注（Phantom 打开以签名）。",
+    status: {
+      ready: "就绪",
+      connecting: "连接中…",
+      live: "直播中",
+      ended: "会话已结束",
+      unavailable: "不可用",
+      signing: "签名中…",
+      refunding: "退款中…",
+      processing: "处理中…",
+    },
+    refundingMessage: "正在从奖池退还你之前的投注…",
+    signingMessage: "在 Phantom 中批准以签名你的投注…",
+    done: "完成",
+    manageByVoice: "语音管理投注",
+    startSession: "开始语音会话",
+    mute: "静音",
+    unmute: "取消静音",
+    endSession: "结束会话",
+    newSession: "新会话",
+    linkedWallet: "已连接钱包：",
+    callId: "通话 ID：",
+    viewLiveMoments: "查看直播时刻",
+  },
+  bets: {
+    yourPick: "你的选择",
+    stake: "投注",
+    potentialWin: "潜在收益",
+    resultPayout: "结果派彩",
+    refundedStake: "已退投注",
+    claimWinnings: "领取奖金",
+    claiming: "领取中…",
+    manageByVoice: "语音管理",
+    matchLocked: "比赛已开始 — 更改已锁定",
+    status: {
+      open: { label: "开放", description: "开赛前点击以语音管理" },
+      locked: { label: "进行中", description: "比赛已开始 — 等待结果" },
+      won: { label: "获胜", description: "领取你的奖金" },
+      lost: { label: "失败", description: "下次好运" },
+      settled: { label: "已结算", description: "链上已领取奖金" },
+      cancelled: { label: "已取消", description: "开赛前全额退款" },
+      replaced: { label: "已替换", description: "已被该比赛的较新投注取代" },
+    },
+  },
+  live: {
+    eyebrow: "直播脉搏",
+    title: "球场",
+    description:
+      "世界杯比赛进行中的进球、中场和比赛节奏。",
+    loading: "正在检查直播比赛…",
+    unavailableTitle: "直播不可用",
+    unavailableDescription:
+      "需要 TxLINE 的活跃赛程数据才能打开直播球场。",
+    noMatchTitle: "当前没有进行中的比赛",
+    noMatchDescription:
+      "世界杯比赛开球时直播会自动打开。你仍可在首页预测即将进行的比赛。",
+    browseMatches: "浏览即将进行的比赛",
+  },
+  profiles: {
+    eyebrow: "身份",
+    title: "个人资料",
+    description: "在一处管理身份、钱包和链上投注。",
+    connectTitle: "连接以查看个人资料",
+    connectDescription:
+      "连接后，钱包地址、用户名、头像、余额和投注历史将显示在此处。",
+    disconnectedDescription:
+      "连接钱包以管理个人资料、钱包和投注。",
+    tabs: {
+      details: "详情",
+      wallet: "钱包",
+      bets: "投注",
+    },
+  },
+  leaderboard: {
+    eyebrow: "社区",
+    title: "排行榜",
+    description:
+      "按链上奖金排名的顶级预测者。在个人资料中设置用户名以显示名称。",
+    topWinners: "顶级赢家",
+    loading: "正在加载排行榜…",
+    empty: "尚无赢家。成为第一个投注并领取获胜预测的人。",
+    recentWins: "近期获胜",
+    loadingRecent: "正在加载近期获胜…",
+    emptyRecent: "结算后获胜预测将显示在此处。",
+    totalWon: "总赢得",
+    wins: "{{count}} 胜",
+    winsPlural: "{{count}} 胜",
+    rank1: "第 1 名",
+    rank2: "第 2 名",
+    rank3: "第 3 名",
+    rankNth: "第 {{rank}} 名",
+  },
+  wallet: {
+    connect: "连接钱包",
+    reconnecting: "重新连接中…",
+    restoring: "正在恢复钱包会话…",
+    gateTitle: "连接钱包",
+    gateDescription:
+      "链接 Phantom 以进行预测、进入语音 Booth 并接收结算证明。",
+  },
+  common: {
+    loading: "加载中…",
+  },
+  settings: {
+    title: "设置",
+    subtitle: "管理偏好设置和账户",
+    preferences: {
+      title: "偏好设置",
+      language: "语言",
+      change: "更改",
+    },
+    about: {
+      title: "关于",
+      version: "版本 1.0.0",
+      tagline: "说出你的投注。带可验证结算的语音预测。",
+    },
+    privacy: "隐私政策",
+    terms: "服务条款",
+    support: "支持",
+  },
+  language: {
+    selectTitle: "选择语言",
+    selectDescription:
+      "选择你的首选语言。适用于应用界面和语音 Booth。",
+  },
+};
+
+export default locale;
