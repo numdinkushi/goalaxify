@@ -9,6 +9,7 @@
  */
 
 import type * as fixtures from "../fixtures.js";
+import type * as profiles from "../profiles.js";
 
 import type {
   ApiFromModules,
@@ -18,6 +19,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   fixtures: typeof fixtures;
+  profiles: typeof profiles;
 }>;
 
 /**
