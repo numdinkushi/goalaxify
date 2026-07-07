@@ -9,6 +9,7 @@
  */
 
 import type * as fixtures from "../fixtures.js";
+import type * as leaderboard from "../leaderboard.js";
 import type * as predictions from "../predictions.js";
 import type * as profiles from "../profiles.js";
 
@@ -20,6 +21,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   fixtures: typeof fixtures;
+  leaderboard: typeof leaderboard;
   predictions: typeof predictions;
   profiles: typeof profiles;
 }>;

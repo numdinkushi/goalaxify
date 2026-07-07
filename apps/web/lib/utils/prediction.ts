@@ -94,6 +94,8 @@ export function buildDraftFromContext(input: {
     stakeToken,
     homeTeam: input.context.homeTeam,
     awayTeam: input.context.awayTeam,
+    kickoffAt: input.context.kickoffAt,
+    round: input.context.round,
     vapiCallId: input.vapiCallId,
     estimatedReturn: estimateReturnFromOdds(
       selection,

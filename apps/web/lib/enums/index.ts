@@ -2,9 +2,15 @@ export enum AppRoute {
   Home = "/",
   Booth = "/booth",
   Live = "/live",
-  Wallet = "/wallet",
+  Leaderboard = "/leaderboard",
   Profiles = "/profiles",
   Settings = "/settings",
+}
+
+export enum ProfileTab {
+  Details = "details",
+  Wallet = "wallet",
+  Bets = "bets",
 }
 
 export enum DataSource {

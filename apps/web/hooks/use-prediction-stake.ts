@@ -165,6 +165,8 @@ export function usePredictionStake() {
           fixtureId: draft.fixtureId,
           homeTeam: draft.homeTeam ?? "",
           awayTeam: draft.awayTeam ?? "",
+          kickoffAt: draft.kickoffAt,
+          round: draft.round,
           market: draft.market,
           selection: draft.selection,
           stakeToken,
