@@ -40,7 +40,11 @@ export class TranslationService {
 
     this.currentLanguage = language;
     this.currentTranslations = loadTranslations(language);
-    this.listeners.forEach((callback) => callback());
+    this.listeners.forEach((listener) => {
+      if (typeof listener === "function") {
+        listener();
+      }
+    });
   }
 
   t(key: TranslationKey, params?: Record<string, string | number>): string {
