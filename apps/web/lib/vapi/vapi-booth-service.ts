@@ -1,13 +1,23 @@
+import type { PredictionDraft } from "@goalaxify/domain";
+
 import type { BoothContext } from "@/lib/data/types";
-import { getBoothAssistantId, getPublicVapiToken } from "@/lib/vapi/config";
+import {
+  buildBoothFirstMessage,
+} from "@/lib/vapi/booth-prompt";
+import { buildBoothModelOverride } from "@/lib/vapi/booth-model";
+import {
+  BOOTH_CLIENT_MESSAGES,
+} from "@/lib/vapi/booth-tools";
 import { parseVapiError } from "@/lib/vapi/parse-error";
-import { formatKickoffTime } from "@/lib/utils/format";
-import { formatScheduleDayLabel } from "@/lib/utils/schedule";
+import { extractSubmitPredictionDraft } from "@/lib/vapi/parse-tool-call";
+import { getBoothAssistantId, getPublicVapiToken } from "@/lib/vapi/config";
 
 export type BoothCallConfig = {
   context: BoothContext;
+  walletPubkey?: string | null;
   onCallStart?: (callId?: string) => void;
   onCallEnd?: (callId?: string) => void;
+  onPredictionSubmit?: (draft: PredictionDraft) => void;
   onError?: (error: unknown) => void;
 };
 
@@ -18,6 +28,8 @@ export class VapiBoothService {
   private currentCall: VapiInstance | null = null;
   private activeCallId: string | null = null;
   private lastCallId: string | null = null;
+  private predictionCaptured = false;
+  private messageHandler: ((message: unknown) => void) | null = null;
 
   private constructor() {}
 
@@ -41,9 +53,12 @@ export class VapiBoothService {
       } catch {
         // ignore stale call cleanup errors
       }
+      this.detachMessageHandler();
       this.currentCall = null;
       this.activeCallId = null;
     }
+
+    this.predictionCaptured = false;
 
     const Vapi = (await import("@vapi-ai/web")).default;
     this.currentCall = new Vapi(apiKey);
@@ -66,12 +81,35 @@ export class VapiBoothService {
 
     this.currentCall.on("call-end", () => {
       this.activeCallId = null;
+      this.detachMessageHandler();
       config.onCallEnd?.(this.lastCallId ?? undefined);
     });
 
     this.currentCall.on("error", (error: unknown) => {
       config.onError?.(error);
     });
+
+    this.messageHandler = (message: unknown) => {
+      if (this.predictionCaptured) return;
+
+      const draft = extractSubmitPredictionDraft(
+        message,
+        config.context,
+        this.activeCallId ?? this.lastCallId,
+      );
+
+      if (!draft) return;
+
+      this.predictionCaptured = true;
+      config.onPredictionSubmit?.(draft);
+
+      // End the call shortly after capture so the assistant can finish its goodbye.
+      window.setTimeout(() => {
+        void this.endCall();
+      }, 1200);
+    };
+
+    this.currentCall.on("message", this.messageHandler);
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -87,11 +125,10 @@ export class VapiBoothService {
     }
 
     const { context } = config;
-    const kickoffHint = context.kickoffAt
-      ? ` Kickoff is ${formatScheduleDayLabel(context.kickoffAt)} at ${formatKickoffTime(context.kickoffAt)}.`
-      : "";
     const assistantOverrides = {
-      firstMessage: `Welcome to the Goalaxify booth! ${context.homeTeam} vs ${context.awayTeam} — ${context.round}.${kickoffHint} Tell me your match prediction and stake.`,
+      firstMessage: buildBoothFirstMessage(context),
+      clientMessages: [...BOOTH_CLIENT_MESSAGES],
+      model: buildBoothModelOverride(context),
       metadata: {
         fixtureId: context.fixtureId,
         homeTeam: context.homeTeam,
@@ -99,13 +136,17 @@ export class VapiBoothService {
         round: context.round,
         kickoffAt: context.kickoffAt,
         market: context.market,
+        walletPubkey: config.walletPubkey ?? undefined,
         app: "goalaxify",
       },
-      maxDurationSeconds: 300,
+      maxDurationSeconds: 180,
     };
 
     try {
-      const call = await this.currentCall.start(assistantId, assistantOverrides);
+      const call = await this.currentCall.start(
+        assistantId,
+        assistantOverrides as unknown as Parameters<VapiInstance["start"]>[1],
+      );
       if (call?.id) {
         this.activeCallId = call.id;
         this.lastCallId = call.id;
@@ -116,8 +157,16 @@ export class VapiBoothService {
     }
   }
 
+  private detachMessageHandler() {
+    if (this.currentCall && this.messageHandler) {
+      this.currentCall.removeListener("message", this.messageHandler);
+      this.messageHandler = null;
+    }
+  }
+
   async endCall() {
     if (this.currentCall) {
+      this.detachMessageHandler();
       await this.currentCall.stop();
       this.currentCall = null;
       this.activeCallId = null;
@@ -138,5 +187,14 @@ export class VapiBoothService {
 
   isCallActive() {
     return this.currentCall !== null;
+  }
+
+  wasPredictionCaptured() {
+    return this.predictionCaptured;
+  }
+
+  resetSessionState() {
+    this.predictionCaptured = false;
+    this.lastCallId = null;
   }
 }

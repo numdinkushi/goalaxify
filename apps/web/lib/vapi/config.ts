@@ -15,3 +15,12 @@ export function getBoothAssistantId(): string {
 export function getPublicVapiToken(): string {
   return process.env.NEXT_PUBLIC_VAPI_WEBTOKEN || "";
 }
+
+/** Must match the LLM configured on your Vapi booth assistant. */
+export function getVapiModelProvider(): string {
+  return process.env.NEXT_PUBLIC_VAPI_MODEL_PROVIDER || "openai";
+}
+
+export function getVapiModelName(): string {
+  return process.env.NEXT_PUBLIC_VAPI_MODEL_NAME || "gpt-4o";
+}

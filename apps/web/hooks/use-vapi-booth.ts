@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
+import type { PredictionDraft } from "@goalaxify/domain";
 
 import type { BoothContext } from "@/lib/data/types";
 import { BoothCallStatus } from "@/lib/enums";
@@ -14,13 +15,23 @@ import { VapiBoothService } from "@/lib/vapi/vapi-booth-service";
 
 type UseVapiBoothOptions = {
   context: BoothContext;
+  walletPubkey?: string | null;
+  onSessionEnded?: (callId?: string) => void;
+  onPredictionSubmit?: (draft: PredictionDraft) => void;
 };
 
-export function useVapiBooth({ context }: UseVapiBoothOptions) {
+export function useVapiBooth({
+  context,
+  walletPubkey,
+  onSessionEnded,
+  onPredictionSubmit,
+}: UseVapiBoothOptions) {
   const [status, setStatus] = useState<BoothCallStatus>(BoothCallStatus.Idle);
   const [callId, setCallId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isMuted, setIsMuted] = useState(false);
+  const [capturedDraft, setCapturedDraft] = useState<PredictionDraft | null>(null);
+  const autoCapturedRef = useRef(false);
 
   const vapiEnabled = isVapiCallsEnabled();
 
@@ -33,18 +44,28 @@ export function useVapiBooth({ context }: UseVapiBoothOptions) {
 
     setStatus(BoothCallStatus.Connecting);
     setError(null);
+    setCapturedDraft(null);
+    autoCapturedRef.current = false;
+    VapiBoothService.getInstance().resetSessionState();
 
     const service = VapiBoothService.getInstance();
 
     try {
       await service.startCall({
         context,
+        walletPubkey,
         onCallStart: (id) => {
           if (id) setCallId(id);
           setStatus(BoothCallStatus.Active);
         },
-        onCallEnd: () => {
+        onPredictionSubmit: (draft) => {
+          autoCapturedRef.current = true;
+          setCapturedDraft(draft);
+          onPredictionSubmit?.(draft);
+        },
+        onCallEnd: (id) => {
           setStatus(BoothCallStatus.Ended);
+          onSessionEnded?.(id);
         },
         onError: (err) => {
           const message = parseVapiError(err);
@@ -57,7 +78,7 @@ export function useVapiBooth({ context }: UseVapiBoothOptions) {
       setError(message);
       setStatus(BoothCallStatus.Error);
     }
-  }, [context, vapiEnabled]);
+  }, [context, onPredictionSubmit, onSessionEnded, vapiEnabled, walletPubkey]);
 
   const endSession = useCallback(async () => {
     await VapiBoothService.getInstance().endCall();
@@ -76,6 +97,9 @@ export function useVapiBooth({ context }: UseVapiBoothOptions) {
     setCallId(null);
     setError(null);
     setIsMuted(false);
+    setCapturedDraft(null);
+    autoCapturedRef.current = false;
+    VapiBoothService.getInstance().resetSessionState();
   }, []);
 
   const isMicError = error ? isMicPermissionError(error) : false;
@@ -86,6 +110,8 @@ export function useVapiBooth({ context }: UseVapiBoothOptions) {
     callId,
     error,
     isMuted,
+    capturedDraft,
+    wasAutoCaptured: autoCapturedRef.current,
     vapiEnabled,
     isMicError,
     isBillingError,
