@@ -3,7 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 import "./globals.css";
 import { ConvexClientProvider } from "@/components/providers/convex-client-provider";
-import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
+import { SolanaWalletProvider } from "@/components/wallet/solana-wallet-provider";
 
 const fontSans = Geist({
   subsets: ["latin"],
@@ -33,9 +34,12 @@ export default function RootLayout({
       className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}
     >
       <body className="min-h-svh">
-        <ThemeProvider>
-          <ConvexClientProvider>{children}</ConvexClientProvider>
-        </ThemeProvider>
+        <ConvexClientProvider>
+          <SolanaWalletProvider>
+            {children}
+            <Toaster />
+          </SolanaWalletProvider>
+        </ConvexClientProvider>
       </body>
     </html>
   );

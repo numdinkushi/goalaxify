@@ -1,9 +1,14 @@
+"use client";
+
 import Link from "next/link";
 import { Mic, PlayCircle, ShieldCheck } from "lucide-react";
 
+import { ConnectWalletButton } from "@/components/wallet/connect-wallet-button";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { ActionCardView, SettlementBadgeView } from "@/lib/data/types";
+import { AppRoute } from "@/lib/enums";
+import { useWalletSession } from "@/hooks/use-wallet-session";
 import { cn } from "@/lib/utils";
 
 const ICONS = {
@@ -17,10 +22,14 @@ type ActionCardsProps = {
 };
 
 export function ActionCards({ actions, settlement }: ActionCardsProps) {
+  const { isConnected } = useWalletSession();
+
   return (
     <section className="space-y-3">
       {actions.map((action) => {
         const Icon = ICONS[action.id as keyof typeof ICONS] ?? Mic;
+        const requiresWallet = action.id === "enter-booth";
+        const blocked = requiresWallet && !isConnected;
 
         return (
           <Card key={action.id} className="border-border/80">
@@ -35,19 +44,32 @@ export function ActionCards({ actions, settlement }: ActionCardsProps) {
                   <p className="mt-1 text-sm text-muted-foreground">
                     {action.description}
                   </p>
+                  {blocked && (
+                    <p className="mt-2 text-xs text-brand-pastel-pink">
+                      Connect your wallet to enter the voice booth.
+                    </p>
+                  )}
                 </div>
 
-                <Link
-                  href={action.href}
-                  className={cn(
-                    buttonVariants({ variant: action.variant, size: "sm" }),
-                    "w-full sm:w-auto",
-                    action.disabled && "pointer-events-none opacity-50",
-                  )}
-                  aria-disabled={action.disabled}
-                >
-                  {action.cta}
-                </Link>
+                {blocked ? (
+                  <ConnectWalletButton
+                    size="sm"
+                    showAddressWhenConnected={false}
+                    useConnectedMenu={false}
+                  />
+                ) : (
+                  <Link
+                    href={action.href}
+                    className={cn(
+                      buttonVariants({ variant: action.variant, size: "sm" }),
+                      "w-full sm:w-auto",
+                      action.disabled && "pointer-events-none opacity-50",
+                    )}
+                    aria-disabled={action.disabled}
+                  >
+                    {action.cta}
+                  </Link>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -61,6 +83,15 @@ export function ActionCards({ actions, settlement }: ActionCardsProps) {
           <span className="font-medium text-foreground">{settlement.provider}</span>
         </span>
       </div>
+
+      {!isConnected && (
+        <p className="text-center text-xs text-muted-foreground">
+          Need a wallet?{" "}
+          <Link href={AppRoute.Wallet} className="text-brand-coral hover:underline">
+            Set up in Wallet
+          </Link>
+        </p>
+      )}
     </section>
   );
 }

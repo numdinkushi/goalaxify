@@ -3,6 +3,7 @@ export enum AppRoute {
   Booth = "/booth",
   Live = "/live",
   Wallet = "/wallet",
+  Profiles = "/profiles",
   Settings = "/settings",
 }
 
