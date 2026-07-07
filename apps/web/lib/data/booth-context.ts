@@ -11,6 +11,7 @@ export function matchToBoothContext(match: FeaturedMatchView): BoothContext {
     round: match.round,
     kickoffAt: match.kickoffAt,
     market: "match_winner",
+    odds: match.market,
   };
 }
 

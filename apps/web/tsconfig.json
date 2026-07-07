@@ -20,7 +20,8 @@
     ],
     "paths": {
       "@/*": ["./*"],
-      "@goalaxify/convex/*": ["../../convex/*"]
+      "@goalaxify/convex/*": ["../../convex/*"],
+      "@tx-on-chain/*": ["../../vendor/tx-on-chain/*"]
     }
   },
   "include": [
