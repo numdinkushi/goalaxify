@@ -1,0 +1,198 @@
+const locale = {
+  nav: {
+    home: "Start",
+    booth: "Booth",
+    live: "Live",
+    profiles: "Profil",
+    leaderboard: "Rangliste",
+    settings: "Einstellungen",
+  },
+  hero: {
+    worldCup: "WM 2026",
+    tagline: "Sag deine Wette.",
+    description:
+      "Sprachvorhersagen, Live-Tore und verifizierte Abrechnung — für Fans, die das Spiel spüren wollen.",
+  },
+  home: {
+    predictMatch: "Spiel vorhersagen",
+    loadingFixtures: "WM-Spiele und Quoten werden geladen…",
+    noMatchDataTitle: "Derzeit keine Spieldaten",
+    noMatchDataDescription:
+      "Live-WM-Spiele und Quoten sind momentan über TxLINE nicht verfügbar. Wir zeigen keine Platzhalterdaten — schau bald wieder vorbei.",
+    txlineNotConnectedTitle: "TxLINE ist nicht verbunden",
+    txlineNotConnectedDescription:
+      "Füge deine TxLINE-Zugangsdaten hinzu und führe die Einrichtung aus, um Live-Spiele und Quoten zu laden.",
+  },
+  actionCards: {
+    enterBooth: {
+      title: "Booth betreten",
+      description: "Sag deine Vorhersage dem Stadionsprecher.",
+      cta: "Sprachsitzung starten",
+    },
+    thePitch: {
+      title: "Das Spielfeld",
+      description: "Tore, Clips und Live-Spielpuls.",
+      cta: "Live-Feed öffnen",
+    },
+    walletRequired: "Verbinde deine Wallet, um den Sprachbooth zu betreten.",
+    settlement: "Abgerechnet auf Solana mit",
+    settlementProvider: "TxLINE-Nachweis",
+    needWallet: "Wallet benötigt?",
+    setupProfile: "Im Profil einrichten",
+  },
+  match: {
+    market: "Markt",
+    crowd: "Crowd",
+    vs: "vs",
+    isLiveNow: "läuft live",
+    openLive: "Live öffnen",
+    nextUp: "Als Nächstes",
+    txlineMarket: "TxLINE-Markt",
+    marketHint: "Was Buchmacher denken",
+    crowdLabel: "Goalaxify-Crowd",
+    crowdHint: "Wo Fans ihr Geld setzen",
+    boothOpen: "Sprachbooth offen",
+    talkYourBet: "Sag deine Wette",
+    oddsHelp:
+      "Wähle Sieger, Unentschieden oder Auswärts — als einfache Chancen, ohne Wettjargon.",
+    oddsShifting: "Quoten ändern sich",
+    oddsShiftOn: "bei",
+  },
+  booth: {
+    eyebrow: "Vorhersage-Booth",
+    title: "Sag deine Wette",
+    description:
+      "Wähle ein anstehendes Spiel und sage dem Sprecher Markt, Auswahl und Einsatz.",
+    loading: "Spiele für den Booth werden geladen…",
+    voiceTitle: "Sprachbooth",
+    manageHint:
+      "Sprich mit dem Sprecher, um mit voller Rückerstattung zu stornieren oder deine Wette zu ersetzen. Phantom öffnet sich nur bei neuem Einsatz zum Signieren.",
+    stakeHint:
+      "Sag deine Vorhersage dem Stadionsprecher. Bestätige per Sprache — danach setzt die App automatisch (Phantom öffnet zum Signieren).",
+    status: {
+      ready: "Bereit",
+      connecting: "Verbinden…",
+      live: "Live",
+      ended: "Sitzung beendet",
+      unavailable: "Nicht verfügbar",
+      signing: "Signieren…",
+      refunding: "Rückerstattung…",
+      processing: "Verarbeitung…",
+    },
+    refundingMessage: "Dein vorheriger Einsatz wird aus dem Pot zurückerstattet…",
+    signingMessage: "In Phantom genehmigen, um deinen Einsatz zu signieren…",
+    done: "Fertig",
+    manageByVoice: "Wette per Sprache verwalten",
+    startSession: "Sprachsitzung starten",
+    mute: "Stummschalten",
+    unmute: "Stummschaltung aufheben",
+    endSession: "Sitzung beenden",
+    newSession: "Neue Sitzung",
+    linkedWallet: "Verknüpfte Wallet:",
+    callId: "Anruf-ID:",
+    viewLiveMoments: "Live-Momente ansehen",
+  },
+  bets: {
+    yourPick: "Deine Wahl",
+    stake: "Einsatz",
+    potentialWin: "Möglicher Gewinn",
+    resultPayout: "Ergebnisauszahlung",
+    refundedStake: "Erstatteter Einsatz",
+    claimWinnings: "Gewinn einfordern",
+    claiming: "Einfordern…",
+    manageByVoice: "Per Sprache verwalten",
+    matchLocked: "Spiel gestartet — Änderungen gesperrt",
+    status: {
+      open: { label: "Offen", description: "Tippen, um vor Anpfiff per Sprache zu verwalten" },
+      locked: { label: "Läuft", description: "Spiel gestartet — Ergebnis ausstehend" },
+      won: { label: "Gewonnen", description: "Fordere deinen Gewinn ein" },
+      lost: { label: "Verloren", description: "Beim nächsten Mal mehr Glück" },
+      settled: { label: "Abgerechnet", description: "Gewinn on-chain eingefordert" },
+      cancelled: { label: "Storniert", description: "Voller Einsatz vor Anpfiff erstattet" },
+      replaced: { label: "Ersetzt", description: "Durch neuere Wette auf dieses Spiel ersetzt" },
+    },
+  },
+  live: {
+    eyebrow: "Live-Puls",
+    title: "Das Spielfeld",
+    description:
+      "Tore, Halbzeit und Spielrhythmus, wenn ein WM-Spiel läuft.",
+    loading: "Suche nach Live-Spielen…",
+    unavailableTitle: "Live-Feed nicht verfügbar",
+    unavailableDescription:
+      "Wir benötigen aktive TxLINE-Spieldaten, bevor das Live-Spielfeld geöffnet werden kann.",
+    noMatchTitle: "Derzeit kein Spiel im Gange",
+    noMatchDescription:
+      "Der Live-Feed öffnet automatisch beim Anpfiff eines WM-Spiels. Du kannst weiterhin von der Startseite vorhersagen.",
+    browseMatches: "Anstehende Spiele ansehen",
+  },
+  profiles: {
+    eyebrow: "Identität",
+    title: "Profil",
+    description: "Verwalte Identität, Wallet und On-Chain-Wetten an einem Ort.",
+    connectTitle: "Verbinden, um dein Profil zu sehen",
+    connectDescription:
+      "Deine Wallet-Adresse, Benutzername, Avatar, Guthaben und Wettverlauf erscheinen hier nach der Verbindung.",
+    disconnectedDescription:
+      "Verbinde deine Wallet, um Profil, Wallet und Wetten zu verwalten.",
+    tabs: {
+      details: "Details",
+      wallet: "Wallet",
+      bets: "Wetten",
+    },
+  },
+  leaderboard: {
+    eyebrow: "Community",
+    title: "Rangliste",
+    description:
+      "Top-Tipper nach On-Chain-Gewinnen. Lege einen Benutzernamen im Profil fest, um namentlich zu erscheinen.",
+    topWinners: "Top-Gewinner",
+    loading: "Rangliste wird geladen…",
+    empty: "Noch keine Gewinner. Sei der Erste, der setzt und eine gewinnende Vorhersage einfordert.",
+    recentWins: "Aktuelle Siege",
+    loadingRecent: "Aktuelle Siege werden geladen…",
+    emptyRecent: "Gewinnende Vorhersagen erscheinen hier nach der Abrechnung.",
+    totalWon: "Gesamt gewonnen",
+    wins: "{{count}} Sieg",
+    winsPlural: "{{count}} Siege",
+    rank1: "1.",
+    rank2: "2.",
+    rank3: "3.",
+    rankNth: "{{rank}}.",
+  },
+  wallet: {
+    connect: "Wallet verbinden",
+    reconnecting: "Erneut verbinden…",
+    restoring: "Wallet-Sitzung wird wiederhergestellt…",
+    gateTitle: "Wallet verbinden",
+    gateDescription:
+      "Verknüpfe Phantom, um Vorhersagen abzugeben, den Sprachbooth zu betreten und Abrechnungsnachweise zu erhalten.",
+  },
+  common: {
+    loading: "Laden…",
+  },
+  settings: {
+    title: "Einstellungen",
+    subtitle: "Verwalte deine Einstellungen und dein Konto",
+    preferences: {
+      title: "Einstellungen",
+      language: "Sprache",
+      change: "Ändern",
+    },
+    about: {
+      title: "Über",
+      version: "Version 1.0.0",
+      tagline: "Sag deine Wette. Sprachvorhersagen mit verifizierter Abrechnung.",
+    },
+    privacy: "Datenschutzrichtlinie",
+    terms: "Nutzungsbedingungen",
+    support: "Support",
+  },
+  language: {
+    selectTitle: "Sprache wählen",
+    selectDescription:
+      "Wähle deine bevorzugte Sprache. Gilt für die App-Oberfläche und den Sprachbooth.",
+  },
+};
+
+export default locale;

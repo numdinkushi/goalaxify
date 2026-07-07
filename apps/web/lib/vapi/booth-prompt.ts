@@ -1,12 +1,15 @@
 import type { BoothContext, BoothManageBet } from "@/lib/data/types";
 import type { BoothSessionMode } from "@/lib/enums";
 import { BoothSessionMode as BoothSessionModeEnum } from "@/lib/enums";
+import type { LanguageCode } from "@/lib/i18n/language-constants";
+import { buildVoiceLanguagePromptBlock } from "@/lib/i18n/voice-language";
 import { formatKickoffTime } from "@/lib/utils/format";
 import { formatScheduleDayLabel } from "@/lib/utils/schedule";
 
 export type BoothPromptOptions = {
   mode?: BoothSessionMode;
   manageBet?: BoothManageBet | null;
+  language?: LanguageCode;
 };
 
 export function buildBoothSystemPrompt(
@@ -14,6 +17,7 @@ export function buildBoothSystemPrompt(
   options: BoothPromptOptions = {},
 ): string {
   const mode = options.mode ?? BoothSessionModeEnum.Stake;
+  const languageBlock = buildVoiceLanguagePromptBlock(options.language);
   const kickoffHint = context.kickoffAt
     ? `Kickoff: ${formatScheduleDayLabel(context.kickoffAt)} at ${formatKickoffTime(context.kickoffAt)}.`
     : "";
@@ -22,6 +26,8 @@ export function buildBoothSystemPrompt(
     const bet = options.manageBet;
     return [
       "You are the Goalaxify stadium announcer helping a fan manage an existing open bet.",
+      "",
+      languageBlock,
       "",
       "Existing bet:",
       `- Match: ${bet.homeTeam} vs ${bet.awayTeam}`,
@@ -50,6 +56,8 @@ export function buildBoothSystemPrompt(
 
   return [
     "You are the Goalaxify stadium announcer — a voice assistant for World Cup match predictions.",
+    "",
+    languageBlock,
     "",
     "Your ONLY job in this session:",
     "1. Welcome the fan and name the match.",

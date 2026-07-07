@@ -6,6 +6,7 @@ import { Shield } from "lucide-react";
 import { ConnectWalletButton } from "@/components/wallet/connect-wallet-button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useWalletSession } from "@/hooks/use-wallet-session";
+import { useTranslation } from "@/hooks/use-translation";
 
 type WalletGateProps = {
   children: ReactNode;
@@ -15,10 +16,13 @@ type WalletGateProps = {
 
 export function WalletGate({
   children,
-  title = "Connect your wallet",
-  description = "Link your Phantom wallet to place predictions, enter the voice booth, and receive settlement proofs.",
+  title,
+  description,
 }: WalletGateProps) {
   const { isSessionActive, connecting, isRestoring } = useWalletSession();
+  const { t } = useTranslation();
+  const resolvedTitle = title ?? t("wallet.gateTitle");
+  const resolvedDescription = description ?? t("wallet.gateDescription");
 
   if (isSessionActive) {
     return <>{children}</>;
@@ -32,9 +36,9 @@ export function WalletGate({
         </div>
 
         <div className="space-y-2">
-          <h3 className="text-lg font-semibold">{title}</h3>
+          <h3 className="text-lg font-semibold">{resolvedTitle}</h3>
           <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
-            {description}
+            {resolvedDescription}
           </p>
         </div>
 
@@ -46,7 +50,7 @@ export function WalletGate({
 
         {connecting || isRestoring ? (
           <p className="text-xs text-muted-foreground">
-            Restoring your wallet session…
+            {t("wallet.restoring")}
           </p>
         ) : null}
       </CardContent>

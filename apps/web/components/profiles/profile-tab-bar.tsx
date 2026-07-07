@@ -1,6 +1,13 @@
 "use client";
 
 import { ProfileTab } from "@/lib/enums";
+import { useTranslation } from "@/hooks/use-translation";
+
+const TAB_KEYS: Record<ProfileTab, string> = {
+  [ProfileTab.Details]: "profiles.tabs.details",
+  [ProfileTab.Wallet]: "profiles.tabs.wallet",
+  [ProfileTab.Bets]: "profiles.tabs.bets",
+};
 import { cn } from "@/lib/utils";
 
 type ProfileTabBarProps = {
@@ -8,23 +15,21 @@ type ProfileTabBarProps = {
   onTabChange: (tab: ProfileTab) => void;
 };
 
-const TABS: { id: ProfileTab; label: string }[] = [
-  { id: ProfileTab.Details, label: "Details" },
-  { id: ProfileTab.Wallet, label: "Wallet" },
-  { id: ProfileTab.Bets, label: "Bets" },
-];
+const TABS = [ProfileTab.Details, ProfileTab.Wallet, ProfileTab.Bets] as const;
 
 export function ProfileTabBar({ activeTab, onTabChange }: ProfileTabBarProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="grid grid-cols-3 gap-1 rounded-2xl border border-border/80 bg-muted/30 p-1">
       {TABS.map((tab) => {
-        const isActive = activeTab === tab.id;
+        const isActive = activeTab === tab;
 
         return (
           <button
-            key={tab.id}
+            key={tab}
             type="button"
-            onClick={() => onTabChange(tab.id)}
+            onClick={() => onTabChange(tab)}
             className={cn(
               "rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
               isActive
@@ -32,7 +37,7 @@ export function ProfileTabBar({ activeTab, onTabChange }: ProfileTabBarProps) {
                 : "text-muted-foreground hover:text-foreground",
             )}
           >
-            {tab.label}
+            {t(TAB_KEYS[tab])}
           </button>
         );
       })}

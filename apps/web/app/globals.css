@@ -35,7 +35,7 @@
   --success: var(--brand-mint);
   --warning: var(--brand-pastel-pink);
 
-  --bottom-nav-height: 4.5rem;
+  --bottom-nav-height: 5.75rem;
 
   --odds-home: var(--brand-dusty-blue);
   --odds-draw: #64748b;
@@ -130,6 +130,10 @@
 
   .goalaxify-glow {
     box-shadow: 0 0 24px color-mix(in srgb, var(--brand-coral) 35%, transparent);
+  }
+
+  .goalaxify-page {
+    @apply mx-auto w-full max-w-lg;
   }
 
   .odds-track {

@@ -3,6 +3,7 @@ import type { PredictionDraft } from "@goalaxify/domain";
 import type { BoothContext, BoothManageBet } from "@/lib/data/types";
 import type { BoothSessionMode } from "@/lib/enums";
 import { BoothSessionMode as BoothSessionModeEnum } from "@/lib/enums";
+import type { LanguageCode } from "@/lib/i18n/language-constants";
 import { buildBoothAssistantOverrides } from "@/lib/vapi/booth-assistant-overrides";
 import {
   getSharedBoothVapiClient,
@@ -25,6 +26,7 @@ export type BoothCallConfig = {
   walletPubkey?: string | null;
   mode?: BoothSessionMode;
   manageBet?: BoothManageBet | null;
+  language?: LanguageCode;
   onCallStart?: (callId?: string) => void;
   onCallEnd?: (result: BoothCallEndResult) => void;
   onVoiceAction?: (action: BoothToolAction) => void;
@@ -227,6 +229,7 @@ export class VapiBoothService {
       manageBet: config.manageBet ?? undefined,
       walletPubkey: config.walletPubkey,
       managePredictionId: config.manageBet?.predictionId,
+      language: config.language,
     });
 
     try {

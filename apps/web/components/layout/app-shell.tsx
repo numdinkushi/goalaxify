@@ -5,7 +5,7 @@ import { BottomNav } from "@/components/layout/bottom-nav";
 export function AppShell({ children }: { children: ReactNode }) {
   return (
     <>
-      <div className="mx-auto w-full max-w-lg pb-[calc(var(--bottom-nav-height)+env(safe-area-inset-bottom,0px))]">
+      <div className="goalaxify-page pb-[calc(var(--bottom-nav-height)+1.5rem+env(safe-area-inset-bottom,0px))]">
         {children}
       </div>
       <BottomNav />

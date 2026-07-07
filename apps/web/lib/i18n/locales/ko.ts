@@ -1,0 +1,198 @@
+const locale = {
+  nav: {
+    home: "홈",
+    booth: "Booth",
+    live: "라이브",
+    profiles: "프로필",
+    leaderboard: "리더보드",
+    settings: "설정",
+  },
+  hero: {
+    worldCup: "2026 월드컵",
+    tagline: "베팅을 말하세요.",
+    description:
+      "음성 예측, 라이브 골 순간, 검증된 정산 — 경기를 생생하게 느끼고 싶은 팬을 위해.",
+  },
+  home: {
+    predictMatch: "경기 예측하기",
+    loadingFixtures: "월드컵 일정과 배당률 불러오는 중…",
+    noMatchDataTitle: "현재 경기 데이터 없음",
+    noMatchDataDescription:
+      "TxLINE에서 라이브 월드컵 일정과 배당률을 사용할 수 없습니다. 임시 데이터는 표시하지 않습니다 — 잠시 후 다시 확인하세요.",
+    txlineNotConnectedTitle: "TxLINE이 연결되지 않음",
+    txlineNotConnectedDescription:
+      "TxLINE 자격 증명을 추가하고 설정을 실행하여 라이브 일정과 배당률을 불러오세요.",
+  },
+  actionCards: {
+    enterBooth: {
+      title: "Booth 입장",
+      description: "경기장 아나운서에게 예측을 말하세요.",
+      cta: "음성 세션 시작",
+    },
+    thePitch: {
+      title: "피치",
+      description: "골 순간, 클립, 라이브 경기 맥박.",
+      cta: "라이브 피드 열기",
+    },
+    walletRequired: "음성 Booth에 입장하려면 지갑을 연결하세요.",
+    settlement: "Solana에서 정산,",
+    settlementProvider: "TxLINE 증명",
+    needWallet: "지갑이 필요하신가요?",
+    setupProfile: "프로필에서 설정",
+  },
+  match: {
+    market: "마켓",
+    crowd: "크라우드",
+    vs: "vs",
+    isLiveNow: "라이브 중",
+    openLive: "라이브 보기",
+    nextUp: "다음 경기",
+    txlineMarket: "TxLINE 마켓",
+    marketHint: "북메이커의 견해",
+    crowdLabel: "Goalaxify 크라우드",
+    crowdHint: "팬들이 돈을 거는 곳",
+    boothOpen: "음성 Booth 개방",
+    talkYourBet: "베팅을 말하세요",
+    oddsHelp:
+      "승, 무, 패를 선택하세요 — 간단한 확률로 표시, 베팅 전문 용어 없음.",
+    oddsShifting: "배당률 변동 중",
+    oddsShiftOn: "대",
+  },
+  booth: {
+    eyebrow: "예측 Booth",
+    title: "베팅을 말하세요",
+    description:
+      "다가오는 경기를 선택한 뒤 아나운서에게 마켓, 선택, 스테이크를 말하세요.",
+    loading: "Booth용 경기 불러오는 중…",
+    voiceTitle: "음성 Booth",
+    manageHint:
+      "아나운서와 대화하여 전액 환불 취소 또는 베팅 교체가 가능합니다. 새 스테이크 서명이 필요할 때만 Phantom이 열립니다.",
+    stakeHint:
+      "경기장 아나운서에게 예측을 말하세요. 음성으로 확인 — 동의하면 앱이 자동으로 스테이크합니다(Phantom에서 서명).",
+    status: {
+      ready: "준비됨",
+      connecting: "연결 중…",
+      live: "라이브",
+      ended: "세션 종료",
+      unavailable: "사용 불가",
+      signing: "서명 중…",
+      refunding: "환불 중…",
+      processing: "처리 중…",
+    },
+    refundingMessage: "팟에서 이전 스테이크를 환불하는 중…",
+    signingMessage: "Phantom에서 스테이크 서명을 승인하세요…",
+    done: "완료",
+    manageByVoice: "음성으로 베팅 관리",
+    startSession: "음성 세션 시작",
+    mute: "음소거",
+    unmute: "음소거 해제",
+    endSession: "세션 종료",
+    newSession: "새 세션",
+    linkedWallet: "연결된 지갑:",
+    callId: "통화 ID:",
+    viewLiveMoments: "라이브 순간 보기",
+  },
+  bets: {
+    yourPick: "내 선택",
+    stake: "스테이크",
+    potentialWin: "예상 수익",
+    resultPayout: "결과 지급",
+    refundedStake: "환불된 스테이크",
+    claimWinnings: "상금 수령",
+    claiming: "수령 중…",
+    manageByVoice: "음성으로 관리",
+    matchLocked: "경기 시작 — 변경 잠김",
+    status: {
+      open: { label: "열림", description: "킥오프 전 음성으로 관리하려면 탭" },
+      locked: { label: "진행 중", description: "경기 시작 — 결과 대기" },
+      won: { label: "승리", description: "상금을 수령하세요" },
+      lost: { label: "패배", description: "다음 경기에 행운을" },
+      settled: { label: "정산됨", description: "온체인에서 상금 수령 완료" },
+      cancelled: { label: "취소됨", description: "킥오프 전 전액 환불" },
+      replaced: { label: "교체됨", description: "이 경기의 더 새로운 베팅으로 대체됨" },
+    },
+  },
+  live: {
+    eyebrow: "라이브 맥박",
+    title: "피치",
+    description:
+      "월드컵 경기 진행 중 골, 하프타임, 경기 리듬.",
+    loading: "라이브 경기 확인 중…",
+    unavailableTitle: "라이브 피드 사용 불가",
+    unavailableDescription:
+      "라이브 피치를 열려면 TxLINE의 활성 일정 데이터가 필요합니다.",
+    noMatchTitle: "현재 진행 중인 경기 없음",
+    noMatchDescription:
+      "월드컵 경기가 시작되면 라이브 피드가 자동으로 열립니다. 홈에서 다가오는 경기를 예측할 수 있습니다.",
+    browseMatches: "다가오는 경기 보기",
+  },
+  profiles: {
+    eyebrow: "신원",
+    title: "프로필",
+    description: "신원, 지갑, 온체인 베팅을 한곳에서 관리하세요.",
+    connectTitle: "프로필을 보려면 연결하세요",
+    connectDescription:
+      "연결하면 지갑 주소, 사용자 이름, 아바타, 잔액, 베팅 기록이 여기에 표시됩니다.",
+    disconnectedDescription:
+      "프로필, 지갑, 베팅을 관리하려면 지갑을 연결하세요.",
+    tabs: {
+      details: "상세",
+      wallet: "지갑",
+      bets: "베팅",
+    },
+  },
+  leaderboard: {
+    eyebrow: "커뮤니티",
+    title: "리더보드",
+    description:
+      "온체인 상금 기준 상위 예측자. 프로필에서 사용자 이름을 설정하면 이름으로 표시됩니다.",
+    topWinners: "상위 우승자",
+    loading: "리더보드 불러오는 중…",
+    empty: "아직 우승자가 없습니다. 첫 번째로 스테이크하고 승리 예측을 수령하세요.",
+    recentWins: "최근 승리",
+    loadingRecent: "최근 승리 불러오는 중…",
+    emptyRecent: "정산 후 승리 예측이 여기에 표시됩니다.",
+    totalWon: "총 수익",
+    wins: "{{count}}승",
+    winsPlural: "{{count}}승",
+    rank1: "1위",
+    rank2: "2위",
+    rank3: "3위",
+    rankNth: "{{rank}}위",
+  },
+  wallet: {
+    connect: "지갑 연결",
+    reconnecting: "재연결 중…",
+    restoring: "지갑 세션 복원 중…",
+    gateTitle: "지갑 연결",
+    gateDescription:
+      "Phantom을 연결하여 예측, 음성 Booth 입장, 정산 증명을 받으세요.",
+  },
+  common: {
+    loading: "불러오는 중…",
+  },
+  settings: {
+    title: "설정",
+    subtitle: "환경 설정 및 계정 관리",
+    preferences: {
+      title: "환경 설정",
+      language: "언어",
+      change: "변경",
+    },
+    about: {
+      title: "정보",
+      version: "버전 1.0.0",
+      tagline: "베팅을 말하세요. 검증된 정산이 있는 음성 예측.",
+    },
+    privacy: "개인정보 처리방침",
+    terms: "서비스 약관",
+    support: "지원",
+  },
+  language: {
+    selectTitle: "언어 선택",
+    selectDescription:
+      "원하는 언어를 선택하세요. 앱 UI와 음성 Booth 모두에 적용됩니다.",
+  },
+};
+
+export default locale;
