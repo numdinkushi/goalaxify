@@ -1,5 +1,6 @@
 import type { MomentEvent } from "@goalaxify/domain";
 import type { MomentView } from "@/lib/data/types";
+import { MomentClip } from "@/components/live/moment-clip";
 import {
   formatMatchTitle,
   formatRelativeTime,
@@ -22,7 +23,7 @@ export function MomentFeed({ moments, homeTeam, awayTeam }: MomentFeedProps) {
   if (moments.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-border bg-card/50 px-4 py-8 text-center text-sm text-muted-foreground">
-        No moments yet. Kickoff pulse will appear here.
+        No moments yet. Goal clips will appear here as the match unfolds.
       </div>
     );
   }
@@ -39,7 +40,7 @@ export function MomentFeed({ moments, homeTeam, awayTeam }: MomentFeedProps) {
       <div className="space-y-2">
         {moments.map((moment) => (
           <article
-            key={`${moment.fixtureId}-${moment.minute}-${moment.eventType}`}
+            key={moment.id}
             className="rounded-2xl border border-border/80 bg-card/80 px-4 py-3"
           >
             <div className="flex items-center justify-between gap-3">
@@ -55,6 +56,12 @@ export function MomentFeed({ moments, homeTeam, awayTeam }: MomentFeedProps) {
             </p>
             {moment.summary && (
               <p className="mt-1 text-sm text-muted-foreground">{moment.summary}</p>
+            )}
+            {moment.eventType === "goal" && moment.clipUrl && (
+              <MomentClip
+                clipUrl={moment.clipUrl}
+                label={`${EVENT_LABELS.goal} at ${moment.minute} minutes`}
+              />
             )}
           </article>
         ))}

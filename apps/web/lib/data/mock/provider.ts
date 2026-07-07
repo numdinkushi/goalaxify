@@ -3,12 +3,13 @@ import {
   fetchFeaturedMatch,
   fetchUpcomingMatches,
 } from "@/lib/data/txline/enrich";
+import { fetchLiveMoments } from "@/lib/data/txline/fetch-moments";
 import {
   MOCK_ACTION_CARDS,
-  MOCK_MOMENTS,
   MOCK_SETTLEMENT_BADGE,
 } from "@/lib/data/mock/fixtures";
 import { matchToBoothContext } from "@/lib/data/booth-context";
+import { MatchStatus } from "@/lib/enums";
 
 /** TxLINE-only data provider — never serves hardcoded fixture/odds data. */
 export const txlineDataProvider: IDataProvider = {
@@ -25,8 +26,27 @@ export const txlineDataProvider: IDataProvider = {
   },
 
   async getMoments(fixtureId) {
-    if (fixtureId === undefined) return MOCK_MOMENTS;
-    return MOCK_MOMENTS.filter((moment) => moment.fixtureId === fixtureId);
+    const matches = await this.getUpcomingMatches();
+    const targets =
+      fixtureId !== undefined
+        ? matches.filter((match) => match.fixtureId === fixtureId)
+        : matches.filter(
+            (match) =>
+              match.status === MatchStatus.Live ||
+              match.status === MatchStatus.Halftime,
+          );
+
+    if (targets.length === 0) {
+      return [];
+    }
+
+    const momentSets = await Promise.all(
+      targets.map((match) =>
+        fetchLiveMoments(match.fixtureId, match.home.name, match.away.name),
+      ),
+    );
+
+    return momentSets.flat();
   },
 
   async getBoothContext(fixtureId?: number) {

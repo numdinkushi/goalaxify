@@ -17,7 +17,7 @@ import {
   isBoothOpenForMatch,
 } from "@/lib/utils/match";
 
-function getTxlineCredentials() {
+export function getTxlineCredentials() {
   const guestJwt = process.env.TXLINE_GUEST_JWT;
   const apiToken = process.env.TXLINE_API_TOKEN;
   if (!guestJwt || !apiToken) return null;

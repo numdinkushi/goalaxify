@@ -20,12 +20,15 @@ export type FeaturedMatchView = {
 };
 
 export type MomentView = {
+  id: string;
   fixtureId: number;
   minute: number;
   homeScore: number;
   awayScore: number;
   eventType: "goal" | "halftime" | "fulltime";
   summary?: string;
+  scorer?: string;
+  clipUrl?: string;
   createdAt?: number;
 };
 
