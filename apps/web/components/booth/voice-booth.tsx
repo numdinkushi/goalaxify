@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useVapiBooth } from "@/hooks/use-vapi-booth";
+import { useWalletSession } from "@/hooks/use-wallet-session";
 import type { BoothContext } from "@/lib/data/types";
 import { BoothCallStatus } from "@/lib/enums";
 import { AppRoute } from "@/lib/enums";
@@ -27,6 +28,7 @@ const STATUS_LABELS: Record<BoothCallStatus, string> = {
 
 export function VoiceBooth({ context }: VoiceBoothProps) {
   const booth = useVapiBooth({ context });
+  const { isConnected, walletPubkey } = useWalletSession();
 
   return (
     <section className="space-y-4">
@@ -76,7 +78,10 @@ export function VoiceBooth({ context }: VoiceBoothProps) {
 
           <div className="flex flex-wrap gap-2">
             {!booth.isActive && !booth.isConnecting && (
-              <Button onClick={booth.startSession} disabled={!booth.vapiEnabled}>
+              <Button
+                onClick={booth.startSession}
+                disabled={!booth.vapiEnabled || !isConnected}
+              >
                 <Mic className="size-4" />
                 Start voice session
               </Button>
@@ -109,6 +114,13 @@ export function VoiceBooth({ context }: VoiceBoothProps) {
               </Button>
             )}
           </div>
+
+          {walletPubkey && (
+            <p className="text-xs text-muted-foreground">
+              Linked wallet:{" "}
+              <span className="font-mono">{walletPubkey}</span>
+            </p>
+          )}
 
           {booth.callId && (
             <p className="text-xs text-muted-foreground">

@@ -41,4 +41,15 @@ export default defineSchema({
     summary: v.optional(v.string()),
     createdAt: v.number(),
   }).index("by_fixture", ["fixtureId"]),
+
+  profiles: defineTable({
+    walletPubkey: v.string(),
+    displayName: v.optional(v.string()),
+    walletName: v.optional(v.string()),
+    avatarUrl: v.optional(v.string()),
+    avatarStorageId: v.optional(v.id("_storage")),
+    lastConnectedAt: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_wallet", ["walletPubkey"]),
 });
