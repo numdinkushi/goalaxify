@@ -101,7 +101,7 @@ export async function POST(request: Request) {
       walletPubkey: body.walletPubkey,
       claimTxSig: payout.txSig,
       payoutAmount,
-      payoutBaseUnits: payoutBaseUnits.toString(),
+      payoutBaseUnits: payout.paidBaseUnits.toString(),
     });
 
     return NextResponse.json({ ok: true, txSig: payout.txSig });
