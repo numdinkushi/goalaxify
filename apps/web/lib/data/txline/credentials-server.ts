@@ -6,7 +6,7 @@ import {
   resolveTxlineGuestJwt,
   type TxlineNetwork,
 } from "@goalaxify/config";
-import { startGuestSession } from "@goalaxify/txline-sdk";
+import { startGuestSession } from "@goalaxify/txline-sdk/auth/guest-session";
 
 import { isTxlineConfigured } from "@/lib/data/txline/credentials";
 import {
