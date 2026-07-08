@@ -144,25 +144,27 @@ export function resolveTxlineGuestJwt(
   env: EnvSource = getDefaultEnv(),
   network = getTxlineNetworkFromEnv(env),
 ): string | undefined {
-  return resolveNetworkScopedEnvValue(env, "TXLINE_GUEST_JWT", network);
+  return resolveNetworkScopedEnvValue(env, "TXLINE_GUEST_JWT", network, {
+    allowGenericFallback: true,
+  });
 }
 
 export function resolveTxlineApiToken(
   env: EnvSource = getDefaultEnv(),
   network = getTxlineNetworkFromEnv(env),
 ): string | undefined {
-  return resolveNetworkScopedEnvValue(env, "TXLINE_API_TOKEN", network);
+  return resolveNetworkScopedEnvValue(env, "TXLINE_API_TOKEN", network, {
+    allowGenericFallback: true,
+  });
 }
 
 export function resolveTxlineSubscriptionTxSig(
   env: EnvSource = getDefaultEnv(),
   network = getTxlineNetworkFromEnv(env),
 ): string | undefined {
-  return resolveNetworkScopedEnvValue(
-    env,
-    "TXLINE_SUBSCRIPTION_TX_SIG",
-    network,
-  );
+  return resolveNetworkScopedEnvValue(env, "TXLINE_SUBSCRIPTION_TX_SIG", network, {
+    allowGenericFallback: true,
+  });
 }
 
 export function resolveTxlineWalletSecret(

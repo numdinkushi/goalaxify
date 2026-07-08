@@ -2,6 +2,7 @@ import "server-only";
 
 import { cookies } from "next/headers";
 import {
+  getSolanaNetworkFromEnv,
   resolveSolanaNetwork,
   SOLANA_NETWORK_COOKIE,
   SolanaNetwork,
@@ -19,4 +20,13 @@ export async function getRequestSolanaNetwork(): Promise<SolanaNetwork> {
 
 export async function getRequestSettlementNetwork(): Promise<TxlineNetwork> {
   return toTxlineNetwork(await getRequestSolanaNetwork());
+}
+
+/** Deployment network from env — used for TxLINE fixture/odds data. */
+export function getDeploymentSolanaNetwork(): SolanaNetwork {
+  return getSolanaNetworkFromEnv();
+}
+
+export function getDeploymentSettlementNetwork(): TxlineNetwork {
+  return toTxlineNetwork(getDeploymentSolanaNetwork());
 }

@@ -5,7 +5,7 @@ import { TxlineClient } from "@goalaxify/txline-sdk/client";
 import type { FixtureCatalogEntry } from "@/lib/constants/fixtures";
 import { getBoothStatusLabel } from "@/lib/constants/match-copy";
 import type { FeaturedMatchView } from "@/lib/data/types";
-import { getTxlineCredentials } from "@/lib/data/txline/credentials";
+import { resolveTxlineCredentialsForServer } from "@/lib/data/txline/credentials-server";
 import { mapTxlineOddsSnapshot } from "@/lib/data/txline/map-odds";
 import {
   listUpcomingTxlineFixtures,
@@ -14,7 +14,6 @@ import {
 } from "@/lib/data/txline/map-fixtures";
 import { mapTxlineScoresStatus } from "@/lib/data/txline/map-scores";
 import { OddsSource } from "@/lib/enums";
-import { getRequestSettlementNetwork } from "@/lib/solana/network-server";
 import {
   deriveMatchStatus,
   findLiveMatch,
@@ -91,15 +90,17 @@ async function hydrateFixtureFromTxline(
 }
 
 export async function fetchUpcomingMatches(): Promise<FeaturedMatchView[]> {
-  const network = await getRequestSettlementNetwork();
-  const credentials = getTxlineCredentials(network);
-  if (!credentials) {
+  const auth = await resolveTxlineCredentialsForServer();
+  if (!auth) {
     return [];
   }
 
   const client = new TxlineClient({
-    credentials,
-    network,
+    credentials: {
+      guestJwt: auth.guestJwt,
+      apiToken: auth.apiToken,
+    },
+    network: auth.network,
   });
 
   try {
@@ -134,15 +135,17 @@ export async function fetchFeaturedMatch(): Promise<FeaturedMatchView | null> {
 export async function enrichFixtureWithTxlineOdds(
   fixture: FixtureCatalogEntry,
 ): Promise<FeaturedMatchView | null> {
-  const network = await getRequestSettlementNetwork();
-  const credentials = getTxlineCredentials(network);
-  if (!credentials) {
+  const auth = await resolveTxlineCredentialsForServer();
+  if (!auth) {
     return null;
   }
 
   const client = new TxlineClient({
-    credentials,
-    network,
+    credentials: {
+      guestJwt: auth.guestJwt,
+      apiToken: auth.apiToken,
+    },
+    network: auth.network,
   });
   return hydrateFixtureFromTxline(fixture, client);
 }

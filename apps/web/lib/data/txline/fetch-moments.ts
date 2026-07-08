@@ -3,9 +3,8 @@ import "server-only";
 import { TxlineClient } from "@goalaxify/txline-sdk/client";
 
 import type { MomentView } from "@/lib/data/types";
-import { getTxlineCredentials } from "@/lib/data/txline/credentials";
+import { resolveTxlineCredentialsForServer } from "@/lib/data/txline/credentials-server";
 import { mapTxlineScoresToMoments } from "@/lib/data/txline/map-moments";
-import { getRequestSettlementNetwork } from "@/lib/solana/network-server";
 import {
   enrichMomentsWithWscClips,
   fetchWscMatchClips,
@@ -17,13 +16,18 @@ export async function fetchLiveMoments(
   homeTeam: string,
   awayTeam: string,
 ): Promise<MomentView[]> {
-  const network = await getRequestSettlementNetwork();
-  const credentials = getTxlineCredentials(network);
-  if (!credentials) {
+  const auth = await resolveTxlineCredentialsForServer();
+  if (!auth) {
     return [];
   }
 
-  const client = new TxlineClient({ credentials, network });
+  const client = new TxlineClient({
+    credentials: {
+      guestJwt: auth.guestJwt,
+      apiToken: auth.apiToken,
+    },
+    network: auth.network,
+  });
 
   try {
     const [snapshot, wscClips] = await Promise.all([
