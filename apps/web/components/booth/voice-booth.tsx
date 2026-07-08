@@ -15,6 +15,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useSolanaNetwork } from "@/components/providers/solana-network-provider";
 import { useCancelPrediction } from "@/hooks/use-cancel-prediction";
 import { usePredictionStake } from "@/hooks/use-prediction-stake";
 import { useTranslation } from "@/hooks/use-translation";
@@ -42,6 +43,7 @@ import {
   releaseBoothAutoStart,
 } from "@/lib/vapi/auto-start-guard";
 import { cn } from "@/lib/utils";
+import { fetchWalletBalanceLamports } from "@/lib/solana/fetch-balance";
 import {
   resolveAffordableStakeSol,
   solToLamports,
@@ -68,6 +70,7 @@ export function VoiceBooth({
 }: VoiceBoothProps) {
   const { t } = useTranslation();
   const { connection } = useConnection();
+  const { network: solanaNetwork } = useSolanaNetwork();
   const { isConnected, walletPubkey } = useWalletSession();
   const { refresh: refreshWalletBalance } = useWalletBalance();
   const { submitStake, prepareStakeBlockhash } = usePredictionStake();
@@ -186,8 +189,9 @@ export function VoiceBooth({
 
         let stakeDraft = draft;
         if ((draft.stakeToken ?? "SOL") === "SOL") {
-          const balanceLamports = await connection.getBalance(
-            new PublicKey(walletPubkey),
+          const balanceLamports = await fetchWalletBalanceLamports(
+            walletPubkey,
+            solanaNetwork,
           );
           const { stakeSol } = resolveAffordableStakeSol(
             draft.stake,
@@ -246,6 +250,7 @@ export function VoiceBooth({
       manageBet,
       prepareStakeBlockhash,
       refreshWalletBalance,
+      solanaNetwork,
       submitStake,
       t,
       walletPubkey,

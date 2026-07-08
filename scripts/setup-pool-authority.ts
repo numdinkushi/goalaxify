@@ -26,9 +26,6 @@ const lines = [
   `${getNetworkScopedEnvKey("NEXT_PUBLIC_POOL_AUTHORITY_PUBKEY", network)}=${pubkey}`,
   `${getNetworkScopedEnvKey("POOL_AUTHORITY_PUBKEY", network)}=${pubkey}`,
   `${getNetworkScopedEnvKey("POOL_AUTHORITY_SECRET", network)}=${secretJson}`,
-  `NEXT_PUBLIC_POOL_AUTHORITY_PUBKEY=${pubkey}`,
-  `POOL_AUTHORITY_PUBKEY=${pubkey}`,
-  `POOL_AUTHORITY_SECRET=${secretJson}`,
   "",
 ];
 

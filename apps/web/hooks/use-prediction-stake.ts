@@ -9,15 +9,18 @@ import type { PredictionDraft } from "@goalaxify/domain";
 import {
   createPredictionIntent,
   generateIntentId,
-  getPoolAuthorityPubkey,
   getSettlementConfig,
   PoolEscrowClient,
   toBaseUnits,
 } from "@goalaxify/solana-settlement";
 
 import { api } from "@goalaxify/convex/_generated/api";
-import { getSettlementNetworkFromEnv, isPoolAuthorityConfigured } from "@/lib/settlement/config";
+import {
+  getPoolAuthorityPubkeyForClient,
+  isPoolAuthorityConfiguredForClient,
+} from "@/lib/settlement/pool-authority-client";
 import { useSolanaNetwork } from "@/components/providers/solana-network-provider";
+import { fetchWalletBalanceLamports } from "@/lib/solana/fetch-balance";
 import { appToast } from "@/lib/toast";
 import {
   isBlockhashFresh,
@@ -40,7 +43,8 @@ export function usePredictionStake() {
   const [error, setError] = useState<string | null>(null);
   const preparedBlockhashRef = useRef<PreparedBlockhashRef>(null);
 
-  const { settlementNetwork: network } = useSolanaNetwork();
+  const { network: solanaNetwork, settlementNetwork: network } =
+    useSolanaNetwork();
   const settlementConfig = useMemo(
     () => getSettlementConfig(network),
     [network],
@@ -139,14 +143,17 @@ export function usePredictionStake() {
           stakeBaseUnits = result.depositBaseUnits.toString();
           finalStakeAmount = draft.stake;
         } else {
-          const poolAuthority = getPoolAuthorityPubkey(network);
+          const poolAuthority = getPoolAuthorityPubkeyForClient(network);
           if (!poolAuthority) {
             throw new Error(
               `SOL pool escrow is not configured for ${network}. Configure the pool authority in your env file.`,
             );
           }
 
-          const balanceLamports = await connection.getBalance(wallet.publicKey);
+          const balanceLamports = await fetchWalletBalanceLamports(
+            walletPubkey,
+            solanaNetwork,
+          );
           const { stakeSol } = resolveAffordableStakeSol(
             draft.stake,
             balanceLamports,
@@ -234,6 +241,7 @@ export function usePredictionStake() {
       createPrediction,
       network,
       settlementConfig,
+      solanaNetwork,
       wallet,
     ],
   );
@@ -244,7 +252,7 @@ export function usePredictionStake() {
     isBlockhashReady,
     isStaking,
     error,
-    canStakeSol: isPoolAuthorityConfigured(network),
+    canStakeSol: isPoolAuthorityConfiguredForClient(network),
     canStakeUsdc: true,
   };
 }
