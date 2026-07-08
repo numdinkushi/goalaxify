@@ -1,7 +1,7 @@
 import { BoothPageContent } from "@/components/booth/booth-page-content";
 import { MatchDataUnavailable } from "@/components/match/match-data-unavailable";
 import { getDataProvider } from "@/lib/data";
-import { isTxlineConfigured } from "@/lib/data/txline/enrich";
+import { isTxlineConfiguredForRequest } from "@/lib/data/txline/credentials-server";
 
 type BoothMatchesSectionProps = {
   initialFixtureId?: number;
@@ -15,7 +15,7 @@ export async function BoothMatchesSection({
   const matches = await getDataProvider().getUpcomingMatches();
 
   if (matches.length === 0) {
-    const configured = isTxlineConfigured();
+    const configured = await isTxlineConfiguredForRequest();
 
     return (
       <MatchDataUnavailable

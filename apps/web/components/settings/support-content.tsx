@@ -5,7 +5,7 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 
-const SUPPORT_EMAIL = "support@goalaxify.app";
+const SUPPORT_EMAIL = "numdinkushi@gmail.com";
 
 export function SupportContent() {
   const [copied, setCopied] = useState(false);

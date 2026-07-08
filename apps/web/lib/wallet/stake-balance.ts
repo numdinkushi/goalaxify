@@ -69,7 +69,7 @@ export function getInsufficientStakeMessage(
   const maxStake = maxStakeSolFromBalance(balanceLamports);
 
   if (maxStake <= 0) {
-    return `Not enough SOL. You have ${balanceSol.toFixed(4)} SOL — add devnet SOL to cover stake and network fees.`;
+    return `Not enough SOL. You have ${balanceSol.toFixed(4)} SOL — add SOL to cover stake and network fees.`;
   }
 
   return `Not enough SOL for a ${stakeSol.toFixed(3)} SOL stake. You have ${balanceSol.toFixed(4)} SOL — try ${maxStake.toFixed(3)} SOL or less (fees need ~0.00001 SOL extra).`;
@@ -141,7 +141,7 @@ export function parseStakeTransactionError(
         return `Not enough SOL for a ${stakeSol.toFixed(3)} SOL stake${contextHint}. Balance is ${balance.toFixed(4)} SOL — try ${maxStake.toFixed(3)} SOL or less (network fees need a small buffer).`;
       }
 
-      return `Not enough SOL. Balance is ${balance.toFixed(4)} SOL — add devnet SOL to cover stake and fees.`;
+      return `Not enough SOL. Balance is ${balance.toFixed(4)} SOL — add SOL to cover stake and fees.`;
     }
 
     return "Not enough SOL in your wallet to cover this stake and network fees. Lower the stake or add SOL.";

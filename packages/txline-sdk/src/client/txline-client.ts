@@ -1,6 +1,6 @@
 import {
   getTxlineNetworkConfig,
-  type TxlineNetwork,
+  TxlineNetwork,
   WORLD_CUP_FREE_TIERS,
 } from "@goalaxify/config";
 
@@ -20,7 +20,7 @@ export class TxlineClient {
   readonly credentials: TxlineCredentials;
 
   constructor(options: TxlineClientOptions) {
-    this.network = options.network ?? "devnet";
+    this.network = options.network ?? TxlineNetwork.Devnet;
     this.config = getTxlineNetworkConfig(this.network);
     this.credentials = options.credentials;
   }

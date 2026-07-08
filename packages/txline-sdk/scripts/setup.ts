@@ -3,9 +3,13 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { Keypair } from "@solana/web3.js";
 import {
-  setupTxlineAccess,
-  verifyTxlineAccess,
-} from "../src/index";
+  getNetworkScopedEnvKey,
+  getTxlineNetworkFromEnv,
+  resolveTxlineWalletSecret,
+  TxlineNetwork,
+  type TxlineNetwork as TxlineNetworkType,
+} from "@goalaxify/config";
+import { setupTxlineAccess, verifyTxlineAccess } from "../src/index";
 
 const ROOT_ENV = resolve(process.cwd(), "../../.env");
 const WEB_ENV = resolve(process.cwd(), "../../apps/web/.env.local");
@@ -47,36 +51,58 @@ function upsertEnvFile(path: string, updates: Record<string, string>) {
 }
 
 function loadPayerKeypair(): Keypair | undefined {
-  const secret = process.env.SOLANA_DEVNET_WALLET_SECRET;
+  const secret = resolveTxlineWalletSecret();
   if (!secret) return undefined;
 
   const bytes = Uint8Array.from(JSON.parse(secret) as number[]);
   return Keypair.fromSecretKey(bytes);
 }
 
+function getNetworkLabel(network: TxlineNetworkType): string {
+  return network === TxlineNetwork.Mainnet ? "mainnet" : "devnet";
+}
+
 async function main() {
   loadEnvFile(ROOT_ENV);
   loadEnvFile(WEB_ENV);
 
+  const network = getTxlineNetworkFromEnv();
+  const networkLabel = getNetworkLabel(network);
   let payer = loadPayerKeypair();
   let generatedSecret: string | null = null;
 
   if (!payer) {
     payer = Keypair.generate();
     generatedSecret = JSON.stringify(Array.from(payer.secretKey));
-    console.log("No SOLANA_DEVNET_WALLET_SECRET found — generated a devnet wallet.");
-    console.log(`Fund this address with devnet SOL: ${payer.publicKey.toBase58()}`);
-    console.log("https://faucet.solana.com/\n");
+    console.log(
+      `No wallet secret found for ${networkLabel} — generated a ${networkLabel} wallet.`,
+    );
+    console.log(`Fund this address with ${networkLabel} SOL: ${payer.publicKey.toBase58()}`);
+    if (network === TxlineNetwork.Devnet) {
+      console.log("https://faucet.solana.com/\n");
+    } else {
+      console.log();
+    }
+
+    const walletEnvUpdates: Record<string, string> = {
+      [getNetworkScopedEnvKey("SOLANA_WALLET_SECRET", network)]: generatedSecret,
+    };
+    upsertEnvFile(ROOT_ENV, walletEnvUpdates);
+    upsertEnvFile(WEB_ENV, walletEnvUpdates);
+    console.log(`Saved ${getNetworkScopedEnvKey("SOLANA_WALLET_SECRET", network)} to env files.\n`);
   }
 
-  console.log("Setting up TxLINE World Cup free tier on devnet...");
+  console.log(`Setting up TxLINE World Cup free tier on ${networkLabel}...`);
   const access = await setupTxlineAccess({
     payer,
-    network: "devnet",
+    network,
     serviceLevelId: 1,
   });
 
   const envUpdates: Record<string, string> = {
+    [getNetworkScopedEnvKey("TXLINE_GUEST_JWT", network)]: access.guestJwt,
+    [getNetworkScopedEnvKey("TXLINE_API_TOKEN", network)]: access.apiToken,
+    [getNetworkScopedEnvKey("TXLINE_SUBSCRIPTION_TX_SIG", network)]: access.txSig,
     TXLINE_GUEST_JWT: access.guestJwt,
     TXLINE_API_TOKEN: access.apiToken,
     TXLINE_SUBSCRIPTION_TX_SIG: access.txSig,
@@ -84,7 +110,11 @@ async function main() {
   };
 
   if (generatedSecret) {
-    envUpdates.SOLANA_DEVNET_WALLET_SECRET = generatedSecret;
+    envUpdates[getNetworkScopedEnvKey("SOLANA_WALLET_SECRET", network)] =
+      generatedSecret;
+    if (network === TxlineNetwork.Devnet) {
+      envUpdates.SOLANA_DEVNET_WALLET_SECRET = generatedSecret;
+    }
   }
 
   upsertEnvFile(ROOT_ENV, envUpdates);
@@ -102,18 +132,19 @@ async function main() {
   const fixtures = await verifyTxlineAccess(
     access.guestJwt,
     access.apiToken,
-    "devnet",
+    network,
   );
 
-  const fixtureCount = Array.isArray(fixtures) ? fixtures.length : 0;
+  const fixtureList = Array.isArray(fixtures) ? fixtures : [];
+  const fixtureCount = fixtureList.length;
   console.log(`Retrieved ${fixtureCount} fixtures from TxLINE.`);
 
   if (fixtureCount > 0) {
     console.log("Sample fixture:");
-    console.log(JSON.stringify(fixtures[0], null, 2).slice(0, 800));
+    console.log(JSON.stringify(fixtureList[0], null, 2).slice(0, 800));
   }
 
-  console.log("\nRestart the dev server: npm run dev");
+  console.log(`\nRestart the dev server after switching to ${networkLabel}: npm run dev`);
 }
 
 main().catch((error) => {

@@ -1,10 +1,11 @@
+import "server-only";
+
 import { TxlineClient } from "@goalaxify/txline-sdk/client";
 
 import { MatchStatus } from "@/lib/enums";
+import { resolveTxlineCredentialsForServer } from "@/lib/data/txline/credentials-server";
 import { deriveMatchStatus } from "@/lib/utils/match";
 import { deriveWinnerFromScore } from "@/lib/utils/prediction";
-
-import { getTxlineCredentials } from "./enrich";
 import { mapTxlineFixturesSnapshot } from "./map-fixtures";
 import { extractScoresFromSnapshot, mapTxlineScoresStatus } from "./map-scores";
 
@@ -21,12 +22,18 @@ export type FixtureResultView = {
 export async function fetchFixtureResult(
   fixtureId: number,
 ): Promise<FixtureResultView | null> {
-  const credentials = getTxlineCredentials();
-  if (!credentials) {
+  const auth = await resolveTxlineCredentialsForServer();
+  if (!auth) {
     return null;
   }
 
-  const client = new TxlineClient({ credentials });
+  const client = new TxlineClient({
+    credentials: {
+      guestJwt: auth.guestJwt,
+      apiToken: auth.apiToken,
+    },
+    network: auth.network,
+  });
 
   try {
     const [fixturesSnapshot, scoresSnapshot] = await Promise.all([

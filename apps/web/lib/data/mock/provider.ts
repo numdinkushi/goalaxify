@@ -1,8 +1,10 @@
+import "server-only";
+
 import type { IDataProvider } from "@/lib/data/provider";
 import {
   fetchFeaturedMatch,
   fetchUpcomingMatches,
-} from "@/lib/data/txline/enrich";
+} from "@/lib/data/txline/enrich-server";
 import { fetchLiveMoments } from "@/lib/data/txline/fetch-moments";
 import {
   MOCK_ACTION_CARDS,

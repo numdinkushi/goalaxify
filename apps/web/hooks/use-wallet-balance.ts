@@ -1,9 +1,9 @@
 "use client";
 
-import { useConnection } from "@solana/wallet-adapter-react";
-import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
+import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { useSolanaNetwork } from "@/components/providers/solana-network-provider";
 import { useWalletSession } from "@/hooks/use-wallet-session";
 import {
   BALANCE_FOCUS_MIN_MS,
@@ -12,6 +12,7 @@ import {
   isBalanceCacheStale,
   setCachedBalance,
 } from "@/lib/solana/balance-cache";
+import { fetchWalletBalanceLamports } from "@/lib/solana/fetch-balance";
 import { formatSolBalance } from "@/lib/solana/format";
 
 type FetchOptions = {
@@ -19,7 +20,7 @@ type FetchOptions = {
 };
 
 export function useWalletBalance() {
-  const { connection } = useConnection();
+  const { network } = useSolanaNetwork();
   const { liveWalletPubkey, isConnected } = useWalletSession();
   const [lamports, setLamports] = useState<number | null>(null);
   const [isInitialLoading, setIsInitialLoading] = useState(false);
@@ -28,16 +29,19 @@ export function useWalletBalance() {
   const inFlightPubkeyRef = useRef<string | null>(null);
   const lastFetchAtRef = useRef(0);
 
-  const applyCachedBalance = useCallback((pubkey: string) => {
-    const cached = getCachedBalance(pubkey);
-    if (cached) {
-      setLamports(cached.lamports);
-      lastFetchAtRef.current = cached.fetchedAt;
-      return cached;
-    }
+  const applyCachedBalance = useCallback(
+    (pubkey: string) => {
+      const cached = getCachedBalance(network, pubkey);
+      if (cached) {
+        setLamports(cached.lamports);
+        lastFetchAtRef.current = cached.fetchedAt;
+        return cached;
+      }
 
-    return null;
-  }, []);
+      return null;
+    },
+    [network],
+  );
 
   const fetchBalance = useCallback(
     async (pubkey: string, { background = false }: FetchOptions = {}) => {
@@ -45,7 +49,7 @@ export function useWalletBalance() {
         return;
       }
 
-      const cached = getCachedBalance(pubkey);
+      const cached = getCachedBalance(network, pubkey);
       if (background && cached && !isBalanceCacheStale(cached)) {
         return;
       }
@@ -57,8 +61,8 @@ export function useWalletBalance() {
       inFlightPubkeyRef.current = pubkey;
 
       try {
-        const balance = await connection.getBalance(new PublicKey(pubkey));
-        setCachedBalance(pubkey, balance);
+        const balance = await fetchWalletBalanceLamports(pubkey, network);
+        setCachedBalance(network, pubkey, balance);
         setLamports(balance);
         setError(null);
         lastFetchAtRef.current = Date.now();
@@ -74,7 +78,7 @@ export function useWalletBalance() {
         setIsInitialLoading(false);
       }
     },
-    [connection],
+    [network],
   );
 
   useEffect(() => {
@@ -86,13 +90,12 @@ export function useWalletBalance() {
     }
 
     const cached = applyCachedBalance(liveWalletPubkey);
-    const shouldFetch =
-      !cached || isBalanceCacheStale(cached);
+    const shouldFetch = !cached || isBalanceCacheStale(cached);
 
     if (shouldFetch) {
       void fetchBalance(liveWalletPubkey, { background: !!cached });
     }
-  }, [applyCachedBalance, fetchBalance, isConnected, liveWalletPubkey]);
+  }, [applyCachedBalance, fetchBalance, isConnected, liveWalletPubkey, network]);
 
   useEffect(() => {
     if (!isConnected || !liveWalletPubkey) {

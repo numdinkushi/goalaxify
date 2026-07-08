@@ -1,4 +1,4 @@
-export type TxlineNetwork = "devnet" | "mainnet";
+import { TxlineNetwork } from "./network-env";
 
 export interface TxlineNetworkConfig {
   network: TxlineNetwork;
@@ -12,8 +12,8 @@ export interface TxlineNetworkConfig {
 
 /** Official TxLINE network constants from txodds/tx-on-chain */
 export const TXLINE_NETWORKS: Record<TxlineNetwork, TxlineNetworkConfig> = {
-  devnet: {
-    network: "devnet",
+  [TxlineNetwork.Devnet]: {
+    network: TxlineNetwork.Devnet,
     rpcUrl: "https://api.devnet.solana.com",
     apiOrigin: "https://txline-dev.txodds.com",
     apiBaseUrl: "https://txline-dev.txodds.com/api",
@@ -21,8 +21,8 @@ export const TXLINE_NETWORKS: Record<TxlineNetwork, TxlineNetworkConfig> = {
     txlTokenMint: "4Zao8ocPhmMgq7PdsYWyxvqySMGx7xb9cMftPMkEokRG",
     usdtMint: "ELWTKspHKCnCfCiCiqYw1EDH77k8VCP74dK9qytG2Ujh",
   },
-  mainnet: {
-    network: "mainnet",
+  [TxlineNetwork.Mainnet]: {
+    network: TxlineNetwork.Mainnet,
     rpcUrl: "https://api.mainnet-beta.solana.com",
     apiOrigin: "https://txline.txodds.com",
     apiBaseUrl: "https://txline.txodds.com/api",
@@ -37,6 +37,8 @@ export const WORLD_CUP_FREE_TIERS = {
   realtime: 12,
 } as const;
 
-export function getTxlineNetworkConfig(network: TxlineNetwork = "devnet") {
+export function getTxlineNetworkConfig(
+  network: TxlineNetwork = TxlineNetwork.Devnet,
+) {
   return TXLINE_NETWORKS[network];
 }

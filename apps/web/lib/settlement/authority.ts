@@ -1,7 +1,8 @@
 import { Keypair } from "@solana/web3.js";
+import { resolvePoolAuthoritySecret, type TxlineNetwork } from "@goalaxify/config";
 
-export function loadPoolAuthorityKeypair(): Keypair | null {
-  const secret = process.env.POOL_AUTHORITY_SECRET;
+export function loadPoolAuthorityKeypair(network?: TxlineNetwork): Keypair | null {
+  const secret = resolvePoolAuthoritySecret(process.env, network);
   if (!secret) {
     return null;
   }
