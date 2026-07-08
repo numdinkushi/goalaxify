@@ -18,6 +18,7 @@ import {
 import { api } from "@goalaxify/convex/_generated/api";
 import { getSettlementNetworkFromEnv, isPoolAuthorityConfigured } from "@/lib/settlement/config";
 import { useSolanaNetwork } from "@/components/providers/solana-network-provider";
+import { fetchWalletBalanceLamports } from "@/lib/solana/fetch-balance";
 import { appToast } from "@/lib/toast";
 import {
   isBlockhashFresh,
@@ -40,7 +41,8 @@ export function usePredictionStake() {
   const [error, setError] = useState<string | null>(null);
   const preparedBlockhashRef = useRef<PreparedBlockhashRef>(null);
 
-  const { settlementNetwork: network } = useSolanaNetwork();
+  const { network: solanaNetwork, settlementNetwork: network } =
+    useSolanaNetwork();
   const settlementConfig = useMemo(
     () => getSettlementConfig(network),
     [network],
@@ -146,7 +148,10 @@ export function usePredictionStake() {
             );
           }
 
-          const balanceLamports = await connection.getBalance(wallet.publicKey);
+          const balanceLamports = await fetchWalletBalanceLamports(
+            walletPubkey,
+            solanaNetwork,
+          );
           const { stakeSol } = resolveAffordableStakeSol(
             draft.stake,
             balanceLamports,
@@ -234,6 +239,7 @@ export function usePredictionStake() {
       createPrediction,
       network,
       settlementConfig,
+      solanaNetwork,
       wallet,
     ],
   );
