@@ -1,6 +1,12 @@
-import { getTxlineNetworkConfig, type TxlineNetwork } from "@goalaxify/config";
+import {
+  getTxlineNetworkConfig,
+  TxlineNetwork,
+  type TxlineNetwork as TxlineNetworkType,
+} from "@goalaxify/config";
 
-export async function startGuestSession(network: TxlineNetwork = "devnet") {
+export async function startGuestSession(
+  network: TxlineNetworkType = TxlineNetwork.Devnet,
+) {
   const config = getTxlineNetworkConfig(network);
   const response = await fetch(`${config.apiOrigin}/auth/guest/start`, {
     method: "POST",

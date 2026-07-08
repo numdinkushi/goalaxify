@@ -1,4 +1,5 @@
 import { Keypair } from "@solana/web3.js";
+import { TxlineNetwork } from "@goalaxify/config";
 import nacl from "tweetnacl";
 import {
   activateApiToken,
@@ -10,7 +11,7 @@ import { subscribeToFreeTier } from "./subscription/subscribe";
 
 export interface SetupTxlineAccessInput {
   payer?: Keypair;
-  network?: "devnet" | "mainnet";
+  network?: TxlineNetwork;
   serviceLevelId?: number;
 }
 
@@ -25,7 +26,7 @@ export async function setupTxlineAccess(
   input: SetupTxlineAccessInput = {},
 ): Promise<SetupTxlineAccessResult> {
   const payer = input.payer ?? Keypair.generate();
-  const network = input.network ?? "devnet";
+  const network = input.network ?? TxlineNetwork.Devnet;
 
   const guestJwt = await startGuestSession(network);
   const { txSig, walletPublicKey } = await subscribeToFreeTier({
@@ -59,7 +60,7 @@ export async function setupTxlineAccess(
 export async function verifyTxlineAccess(
   guestJwt: string,
   apiToken: string,
-  network: "devnet" | "mainnet" = "devnet",
+  network: TxlineNetwork = TxlineNetwork.Devnet,
 ) {
   const client = new TxlineClient({
     network,

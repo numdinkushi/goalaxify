@@ -1,5 +1,7 @@
 import {
   getTxlineNetworkConfig,
+  getTxlineNetworkFromEnv,
+  resolvePoolAuthorityPubkey,
   type TxlineNetwork,
   type TxlineNetworkConfig,
 } from "@goalaxify/config";
@@ -16,10 +18,7 @@ export function resolveSettlementNetwork(
   network?: TxlineNetwork,
 ): TxlineNetwork {
   if (network) return network;
-  const envNetwork = process.env.NEXT_PUBLIC_SOLANA_NETWORK;
-  return envNetwork === "mainnet-beta" || envNetwork === "mainnet"
-    ? "mainnet"
-    : "devnet";
+  return getTxlineNetworkFromEnv();
 }
 
 export function getSettlementConfig(
@@ -27,9 +26,7 @@ export function getSettlementConfig(
 ): SettlementConfig {
   const resolved = resolveSettlementNetwork(network);
   const base = getTxlineNetworkConfig(resolved);
-  const poolAuthorityRaw =
-    process.env.NEXT_PUBLIC_POOL_AUTHORITY_PUBKEY ??
-    process.env.POOL_AUTHORITY_PUBKEY;
+  const poolAuthorityRaw = resolvePoolAuthorityPubkey(process.env, resolved);
 
   return {
     ...base,

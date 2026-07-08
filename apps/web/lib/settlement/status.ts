@@ -1,4 +1,5 @@
 import { isConvexConfigured } from "@/lib/env/runtime";
+import { getSettlementNetworkFromEnv } from "@/lib/settlement/config";
 import {
   getAppSettlementConfig,
   isOnChainStakingConfigured,
@@ -16,6 +17,7 @@ export type PipelineCheck = {
 
 export function getPredictionPipelineChecks(): PipelineCheck[] {
   const settlement = getAppSettlementConfig();
+  const network = getSettlementNetworkFromEnv();
 
   return [
     {
@@ -43,7 +45,7 @@ export function getPredictionPipelineChecks(): PipelineCheck[] {
       detail:
         isPoolAuthorityConfigured()
           ? `SOL pool + USDC intents on ${settlement.network}`
-          : "Set NEXT_PUBLIC_POOL_AUTHORITY_PUBKEY for SOL pool escrow",
+          : `Configure pool authority for ${network} SOL escrow`,
     },
     {
       id: "convex",

@@ -13,19 +13,23 @@ import {
   Transaction,
   sendAndConfirmTransaction,
 } from "@solana/web3.js";
-import { getTxlineNetworkConfig, type TxlineNetwork } from "@goalaxify/config";
+import {
+  getTxlineNetworkConfig,
+  TxlineNetwork,
+  type TxlineNetwork as TxlineNetworkType,
+} from "@goalaxify/config";
 import txoracleDevnetIdl from "@tx-on-chain/idl/txoracle-devnet.json";
 import txoracleMainnetIdl from "@tx-on-chain/idl/txoracle.json";
 import type { Txoracle } from "@tx-on-chain/types/txoracle";
 
-function getTxoracleIdl(network: TxlineNetwork): Txoracle {
+function getTxoracleIdl(network: TxlineNetworkType): Txoracle {
   const idl =
-    network === "devnet" ? txoracleDevnetIdl : txoracleMainnetIdl;
+    network === TxlineNetwork.Devnet ? txoracleDevnetIdl : txoracleMainnetIdl;
   return idl as Txoracle;
 }
 
 export interface SubscribeInput {
-  network?: TxlineNetwork;
+  network?: TxlineNetworkType;
   payer: Keypair;
   serviceLevelId?: number;
   durationWeeks?: number;
@@ -75,7 +79,7 @@ async function ensureUserTokenAccount(
 export async function subscribeToFreeTier(
   input: SubscribeInput,
 ): Promise<SubscribeResult> {
-  const network = input.network ?? "devnet";
+  const network = input.network ?? TxlineNetwork.Devnet;
   const config = getTxlineNetworkConfig(network);
   const serviceLevelId = input.serviceLevelId ?? 1;
   const durationWeeks = input.durationWeeks ?? 4;

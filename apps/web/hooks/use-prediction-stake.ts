@@ -17,6 +17,7 @@ import {
 
 import { api } from "@goalaxify/convex/_generated/api";
 import { getSettlementNetworkFromEnv, isPoolAuthorityConfigured } from "@/lib/settlement/config";
+import { useSolanaNetwork } from "@/components/providers/solana-network-provider";
 import { appToast } from "@/lib/toast";
 import {
   isBlockhashFresh,
@@ -39,7 +40,7 @@ export function usePredictionStake() {
   const [error, setError] = useState<string | null>(null);
   const preparedBlockhashRef = useRef<PreparedBlockhashRef>(null);
 
-  const network = getSettlementNetworkFromEnv();
+  const { settlementNetwork: network } = useSolanaNetwork();
   const settlementConfig = useMemo(
     () => getSettlementConfig(network),
     [network],
@@ -141,7 +142,7 @@ export function usePredictionStake() {
           const poolAuthority = getPoolAuthorityPubkey(network);
           if (!poolAuthority) {
             throw new Error(
-              "SOL pool escrow is not configured. Set NEXT_PUBLIC_POOL_AUTHORITY_PUBKEY.",
+              `SOL pool escrow is not configured for ${network}. Configure the pool authority in your env file.`,
             );
           }
 
@@ -243,7 +244,7 @@ export function usePredictionStake() {
     isBlockhashReady,
     isStaking,
     error,
-    canStakeSol: isPoolAuthorityConfigured(),
+    canStakeSol: isPoolAuthorityConfigured(network),
     canStakeUsdc: true,
   };
 }

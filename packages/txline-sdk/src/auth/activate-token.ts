@@ -1,7 +1,11 @@
-import { getTxlineNetworkConfig, type TxlineNetwork } from "@goalaxify/config";
+import {
+  getTxlineNetworkConfig,
+  TxlineNetwork,
+  type TxlineNetwork as TxlineNetworkType,
+} from "@goalaxify/config";
 
 export interface ActivateTokenInput {
-  network?: TxlineNetwork;
+  network?: TxlineNetworkType;
   guestJwt: string;
   txSig: string;
   walletSignature: string;
@@ -9,7 +13,7 @@ export interface ActivateTokenInput {
 }
 
 export async function activateApiToken(input: ActivateTokenInput) {
-  const network = input.network ?? "devnet";
+  const network = input.network ?? TxlineNetwork.Devnet;
   const config = getTxlineNetworkConfig(network);
   const leagues = input.leagues ?? [];
 

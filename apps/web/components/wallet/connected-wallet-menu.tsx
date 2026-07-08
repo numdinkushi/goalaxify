@@ -4,6 +4,10 @@ import { Check, ChevronDown, Copy, LogOut, Wallet } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import {
+  SolanaNetworkBadge,
+  SolanaNetworkToggle,
+} from "@/components/wallet/solana-network-toggle";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { useWalletSession } from "@/hooks/use-wallet-session";
 import { appToast } from "@/lib/toast";
@@ -73,6 +77,7 @@ export function ConnectedWalletMenu({
       >
         <Wallet className="size-4" />
         {shortWalletAddress(walletPubkey)}
+        <SolanaNetworkBadge />
         <ChevronDown
           className={cn(
             "size-3.5 opacity-70 transition-transform",
@@ -110,6 +115,16 @@ export function ConnectedWalletMenu({
                 via {wallet.adapter.name}
               </p>
             ) : null}
+          </div>
+
+          <div className="border-b border-border/60 px-3 py-2.5">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-xs text-muted-foreground">Network</p>
+              <SolanaNetworkBadge />
+            </div>
+            <div className="mt-2 flex justify-end">
+              <SolanaNetworkToggle size="sm" />
+            </div>
           </div>
 
           <button

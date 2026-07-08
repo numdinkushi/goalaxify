@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { useProfileEditor, useProfileView } from "@/hooks/use-profile-view";
-import { getSolanaNetwork } from "@/lib/solana/config";
+import { WalletNetworkRow } from "@/components/wallet/wallet-network-row";
 import { formatFriendlyDate } from "@/lib/utils/format";
 import { shortWalletAddress } from "@/lib/wallet/utils";
 
@@ -133,10 +133,7 @@ export function ProfileDetailsTab() {
               <span className="text-muted-foreground">Wallet app</span>
               <span className="font-medium">{wallet?.adapter.name ?? "—"}</span>
             </div>
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-muted-foreground">Network</span>
-              <span className="font-medium capitalize">{getSolanaNetwork()}</span>
-            </div>
+            <WalletNetworkRow compact />
             <div className="flex items-center justify-between gap-3">
               <span className="text-muted-foreground">Member since</span>
               <span className="font-medium">

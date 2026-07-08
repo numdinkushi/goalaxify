@@ -1,10 +1,12 @@
+import "server-only";
+
 import { TxlineClient } from "@goalaxify/txline-sdk/client";
 
 import { MatchStatus } from "@/lib/enums";
+import { getTxlineCredentials } from "@/lib/data/txline/credentials";
+import { getRequestSettlementNetwork } from "@/lib/solana/network-server";
 import { deriveMatchStatus } from "@/lib/utils/match";
 import { deriveWinnerFromScore } from "@/lib/utils/prediction";
-
-import { getTxlineCredentials } from "./enrich";
 import { mapTxlineFixturesSnapshot } from "./map-fixtures";
 import { extractScoresFromSnapshot, mapTxlineScoresStatus } from "./map-scores";
 
@@ -21,12 +23,13 @@ export type FixtureResultView = {
 export async function fetchFixtureResult(
   fixtureId: number,
 ): Promise<FixtureResultView | null> {
-  const credentials = getTxlineCredentials();
+  const network = await getRequestSettlementNetwork();
+  const credentials = getTxlineCredentials(network);
   if (!credentials) {
     return null;
   }
 
-  const client = new TxlineClient({ credentials });
+  const client = new TxlineClient({ credentials, network });
 
   try {
     const [fixturesSnapshot, scoresSnapshot] = await Promise.all([

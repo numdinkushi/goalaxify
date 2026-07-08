@@ -35,31 +35,40 @@ function writeStorageCache(entry: Record<string, BalanceCacheEntry>) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(entry));
 }
 
-export function getCachedBalance(pubkey: string): BalanceCacheEntry | null {
-  const memoryEntry = MEMORY_CACHE.get(pubkey);
+export function getCachedBalance(
+  network: string,
+  pubkey: string,
+): BalanceCacheEntry | null {
+  const cacheKey = `${network}:${pubkey}`;
+  const memoryEntry = MEMORY_CACHE.get(cacheKey);
   if (memoryEntry) {
     return memoryEntry;
   }
 
-  const storageEntry = readStorageCache()[pubkey];
+  const storageEntry = readStorageCache()[cacheKey];
   if (!storageEntry) {
     return null;
   }
 
-  MEMORY_CACHE.set(pubkey, storageEntry);
+  MEMORY_CACHE.set(cacheKey, storageEntry);
   return storageEntry;
 }
 
-export function setCachedBalance(pubkey: string, lamports: number) {
+export function setCachedBalance(
+  network: string,
+  pubkey: string,
+  lamports: number,
+) {
+  const cacheKey = `${network}:${pubkey}`;
   const entry: BalanceCacheEntry = {
     lamports,
     fetchedAt: Date.now(),
   };
 
-  MEMORY_CACHE.set(pubkey, entry);
+  MEMORY_CACHE.set(cacheKey, entry);
 
   const storageCache = readStorageCache();
-  storageCache[pubkey] = entry;
+  storageCache[cacheKey] = entry;
   writeStorageCache(storageCache);
 }
 
@@ -70,10 +79,11 @@ export function isBalanceCacheStale(
   return Date.now() - entry.fetchedAt > staleMs;
 }
 
-export function clearCachedBalance(pubkey: string) {
-  MEMORY_CACHE.delete(pubkey);
+export function clearCachedBalance(network: string, pubkey: string) {
+  const cacheKey = `${network}:${pubkey}`;
+  MEMORY_CACHE.delete(cacheKey);
 
   const storageCache = readStorageCache();
-  delete storageCache[pubkey];
+  delete storageCache[cacheKey];
   writeStorageCache(storageCache);
 }

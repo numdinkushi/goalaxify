@@ -4,16 +4,18 @@ import { Wallet, ShieldCheck, Unplug } from "lucide-react";
 
 import { ConnectWalletButton } from "@/components/wallet/connect-wallet-button";
 import { WalletBalanceCard } from "@/components/wallet/wallet-balance-card";
+import { WalletNetworkRow } from "@/components/wallet/wallet-network-row";
 import { PredictionsPanel } from "@/components/predictions/predictions-panel";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CopyClipButton } from "@/components/ui/copy-clip-button";
+import { useSolanaNetwork } from "@/components/providers/solana-network-provider";
 import { useWalletBalance } from "@/hooks/use-wallet-balance";
 import { useWalletProfile } from "@/hooks/use-wallet-profile";
 import { useWalletSession } from "@/hooks/use-wallet-session";
-import { getSolanaNetwork, getSolanaProgramId } from "@/lib/solana/config";
+import { getSolanaProgramIdForNetwork } from "@/lib/solana/network-utils";
 import { isConvexConfigured } from "@/lib/env/runtime";
 import { appToast } from "@/lib/toast";
 import { shortWalletAddress } from "@/lib/wallet/utils";
@@ -27,7 +29,7 @@ export function WalletPageContent() {
     loading: balanceLoading,
     error: balanceError,
   } = useWalletBalance();
-  const network = getSolanaNetwork();
+  const { balanceLabel, network } = useSolanaNetwork();
 
   return (
     <AppShell>
@@ -80,7 +82,7 @@ export function WalletPageContent() {
 
             {isSessionActive && (
               <WalletBalanceCard
-                label={network === "devnet" ? "Devnet balance" : "Balance"}
+                label={balanceLabel}
                 amount={balanceAmount}
                 loading={balanceLoading}
                 error={balanceError}
@@ -93,10 +95,7 @@ export function WalletPageContent() {
                   <span className="text-muted-foreground">Wallet app</span>
                   <span className="font-medium">{wallet?.adapter.name ?? "Unknown"}</span>
                 </div>
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-muted-foreground">Network</span>
-                  <span className="font-medium capitalize">{network}</span>
-                </div>
+                <WalletNetworkRow />
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-muted-foreground">Short address</span>
                   <div className="flex items-center gap-1.5">
@@ -151,8 +150,8 @@ export function WalletPageContent() {
               <p className="font-medium text-foreground">Settlement program</p>
               <p>
                 Predictions will settle against the TxODDS oracle on Solana
-                {getSolanaProgramId()
-                  ? ` (${shortWalletAddress(getSolanaProgramId(), 6)}).`
+                {getSolanaProgramIdForNetwork(network)
+                  ? ` (${shortWalletAddress(getSolanaProgramIdForNetwork(network), 6)}).`
                   : "."}
               </p>
             </div>

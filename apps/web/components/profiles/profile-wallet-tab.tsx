@@ -4,14 +4,16 @@ import { ShieldCheck, Unplug, Wallet } from "lucide-react";
 
 import { ConnectWalletButton } from "@/components/wallet/connect-wallet-button";
 import { WalletBalanceCard } from "@/components/wallet/wallet-balance-card";
+import { WalletNetworkRow } from "@/components/wallet/wallet-network-row";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CopyClipButton } from "@/components/ui/copy-clip-button";
+import { useSolanaNetwork } from "@/components/providers/solana-network-provider";
 import { useWalletBalance } from "@/hooks/use-wallet-balance";
 import { useWalletProfile } from "@/hooks/use-wallet-profile";
 import { useWalletSession } from "@/hooks/use-wallet-session";
 import { isConvexConfigured } from "@/lib/env/runtime";
-import { getSolanaNetwork, getSolanaProgramId } from "@/lib/solana/config";
+import { getSolanaProgramIdForNetwork } from "@/lib/solana/network-utils";
 import { appToast } from "@/lib/toast";
 import { shortWalletAddress } from "@/lib/wallet/utils";
 
@@ -24,7 +26,7 @@ export function ProfileWalletTab() {
     loading: balanceLoading,
     error: balanceError,
   } = useWalletBalance();
-  const network = getSolanaNetwork();
+  const { balanceLabel, network } = useSolanaNetwork();
 
   return (
     <div className="space-y-4">
@@ -70,7 +72,7 @@ export function ProfileWalletTab() {
 
           {isSessionActive && (
             <WalletBalanceCard
-              label={network === "devnet" ? "Devnet balance" : "Balance"}
+              label={balanceLabel}
               amount={balanceAmount}
               loading={balanceLoading}
               error={balanceError}
@@ -83,10 +85,7 @@ export function ProfileWalletTab() {
                 <span className="text-muted-foreground">Wallet app</span>
                 <span className="font-medium">{wallet?.adapter.name ?? "Unknown"}</span>
               </div>
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-muted-foreground">Network</span>
-                <span className="font-medium capitalize">{network}</span>
-              </div>
+              <WalletNetworkRow compact />
               <div className="flex items-center justify-between gap-3">
                 <span className="text-muted-foreground">Short address</span>
                 <div className="flex items-center gap-1.5">
@@ -139,8 +138,8 @@ export function ProfileWalletTab() {
             <p className="font-medium text-foreground">Settlement program</p>
             <p>
               Predictions settle against the TxODDS oracle on Solana
-              {getSolanaProgramId()
-                ? ` (${shortWalletAddress(getSolanaProgramId(), 6)}).`
+              {getSolanaProgramIdForNetwork(network)
+                ? ` (${shortWalletAddress(getSolanaProgramIdForNetwork(network), 6)}).`
                 : "."}
             </p>
           </div>

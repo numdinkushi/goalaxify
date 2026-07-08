@@ -2,7 +2,6 @@ import { Connection } from "@solana/web3.js";
 import {
   PoolEscrowClient,
   fromBaseUnits,
-  getSettlementConfig,
 } from "@goalaxify/solana-settlement";
 import { NextResponse } from "next/server";
 
@@ -10,8 +9,11 @@ import { api } from "@goalaxify/convex/_generated/api";
 import type { Id } from "@goalaxify/convex/_generated/dataModel";
 import { getConvexHttpClient } from "@/lib/convex/http-client";
 import { loadPoolAuthorityKeypair } from "@/lib/settlement/authority";
-import { getSettlementNetworkFromEnv } from "@/lib/settlement/config";
-import { getSolanaRpcEndpoint } from "@/lib/solana/config";
+import {
+  getRequestSettlementConfig,
+  getRequestSettlementNetwork,
+  getRequestSolanaRpcEndpoint,
+} from "@/lib/solana/request-config";
 
 export async function POST(request: Request) {
   try {
@@ -28,7 +30,8 @@ export async function POST(request: Request) {
     }
 
     const convex = getConvexHttpClient();
-    const authority = loadPoolAuthorityKeypair();
+    const network = await getRequestSettlementNetwork();
+    const authority = loadPoolAuthorityKeypair(network);
 
     if (!convex) {
       return NextResponse.json(
@@ -77,9 +80,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const network = getSettlementNetworkFromEnv();
-    const config = getSettlementConfig(network);
-    const connection = new Connection(getSolanaRpcEndpoint(), "confirmed");
+    const config = await getRequestSettlementConfig();
+    const connection = new Connection(await getRequestSolanaRpcEndpoint(), "confirmed");
     const poolClient = new PoolEscrowClient(connection, network);
 
     const { PublicKey } = await import("@solana/web3.js");

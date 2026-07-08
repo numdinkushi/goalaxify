@@ -7,6 +7,7 @@ import { ServiceWorkerRegister } from "@/components/pwa/service-worker-register"
 import { AppPreferencesProvider } from "@/components/providers/app-preferences-provider";
 import { ConvexClientProvider } from "@/components/providers/convex-client-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { SolanaNetworkProvider } from "@/components/providers/solana-network-provider";
 import { SolanaWalletProvider } from "@/components/wallet/solana-wallet-provider";
 import {
   PWA_BACKGROUND_COLOR,
@@ -87,12 +88,14 @@ export default function RootLayout({
       <body className="min-h-dvh min-h-svh">
         <ConvexClientProvider>
           <AppPreferencesProvider>
-            <SolanaWalletProvider>
-              <ServiceWorkerRegister />
-              {children}
-              <PwaComponents />
-              <Toaster />
-            </SolanaWalletProvider>
+            <SolanaNetworkProvider>
+              <SolanaWalletProvider>
+                <ServiceWorkerRegister />
+                {children}
+                <PwaComponents />
+                <Toaster />
+              </SolanaWalletProvider>
+            </SolanaNetworkProvider>
           </AppPreferencesProvider>
         </ConvexClientProvider>
       </body>

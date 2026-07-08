@@ -12,12 +12,14 @@ import {
   XCircle,
 } from "lucide-react";
 
+import { SolanaNetwork } from "@goalaxify/config";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MatchTeamTitle, OutcomeLabel } from "@/components/match/match-labels";
+import { useSolanaNetwork } from "@/components/providers/solana-network-provider";
 import { AppRoute } from "@/lib/enums";
 import { useTranslation } from "@/hooks/use-translation";
-import { getSolanaNetwork } from "@/lib/solana/config";
 import {
   canManageBet,
   formatBetKickoff,
@@ -120,9 +122,9 @@ export function BetCard({
     fixtureMeta?.homeScore,
     fixtureMeta?.awayScore,
   );
-  const network = getSolanaNetwork();
+  const { network } = useSolanaNetwork();
   const explorerCluster =
-    network === "mainnet-beta" ? "" : `?cluster=${network}`;
+    network === SolanaNetwork.MainnetBeta ? "" : `?cluster=${network}`;
 
   const manageHref = `${AppRoute.Booth}?fixture=${prediction.fixtureId}&prediction=${prediction._id}`;
 
