@@ -5,10 +5,7 @@ import {
 } from "@goalaxify/config";
 import { NextResponse } from "next/server";
 
-import {
-  isTxlineConfiguredForRequest,
-  resolveTxlineCredentialsForServer,
-} from "@/lib/data/txline/credentials-server";
+import { resolveTxlineCredentialsForServer } from "@/lib/data/txline/credentials-server";
 import { mapTxlineFixturesSnapshot } from "@/lib/data/txline/map-fixtures";
 import {
   getDeploymentSettlementNetwork,
@@ -27,7 +24,7 @@ export async function GET() {
     requestNetwork,
   );
 
-  const configured = await isTxlineConfiguredForRequest();
+  const configured = Boolean(await resolveTxlineCredentialsForServer());
   const auth = configured ? await resolveTxlineCredentialsForServer() : null;
 
   let fixtureCount: number | null = null;

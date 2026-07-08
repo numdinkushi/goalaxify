@@ -1,14 +1,13 @@
 import "server-only";
 
 import {
-  getTxlineNetworkFromEnv,
   resolveTxlineApiToken,
   resolveTxlineGuestJwt,
   type TxlineNetwork,
 } from "@goalaxify/config";
 import { startGuestSession } from "@goalaxify/txline-sdk/auth/guest-session";
 
-import { isTxlineConfigured } from "@/lib/data/txline/credentials";
+import { hasTxlineApiToken } from "@/lib/data/txline/credentials";
 import {
   getDeploymentSettlementNetwork,
   getRequestSettlementNetwork,
@@ -48,14 +47,18 @@ export async function resolveTxlineCredentialsForServer(
 }
 
 export async function isTxlineConfiguredForRequest(): Promise<boolean> {
-  const requestNetwork = await getRequestSettlementNetwork();
-  if (isTxlineConfigured(requestNetwork)) {
+  if (await resolveTxlineCredentialsForServer()) {
     return true;
   }
 
+  const requestNetwork = await getRequestSettlementNetwork();
   const deploymentNetwork = getDeploymentSettlementNetwork();
+  if (requestNetwork === deploymentNetwork) {
+    return false;
+  }
+
   return (
-    requestNetwork !== deploymentNetwork &&
-    isTxlineConfigured(deploymentNetwork)
+    hasTxlineApiToken(deploymentNetwork) &&
+    (await resolveTxlineCredentialsForServer(deploymentNetwork)) !== null
   );
 }
