@@ -41,16 +41,14 @@ const SolanaNetworkContext = createContext<SolanaNetworkContextValue | undefined
 
 export function SolanaNetworkProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const [network, setNetworkState] = useState<SolanaNetwork>(
-    getDefaultSolanaNetworkFromEnv,
-  );
-  const shouldRefreshRef = useRef(false);
+  const [network, setNetworkState] = useState<SolanaNetwork>(() => {
+    if (typeof window !== "undefined") {
+      return getInitialSolanaNetwork();
+    }
 
-  useEffect(() => {
-    const initialNetwork = getInitialSolanaNetwork();
-    setNetworkState(initialNetwork);
-    saveSolanaNetworkPreference(initialNetwork);
-  }, []);
+    return getDefaultSolanaNetworkFromEnv();
+  });
+  const shouldRefreshRef = useRef(false);
 
   useEffect(() => {
     if (!shouldRefreshRef.current) {

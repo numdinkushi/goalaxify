@@ -11,6 +11,7 @@ export {
   resolvePoolAuthorityPubkey,
   resolveSolanaNetwork,
   SOLANA_NETWORK_COOKIE,
+  SOLANA_NETWORK_EXPLICIT_COOKIE,
   resolvePoolAuthoritySecret,
   resolveSolanaProgramId,
   resolveSolanaRpcUrl,

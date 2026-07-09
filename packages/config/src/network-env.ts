@@ -18,6 +18,7 @@ export enum TxlineNetwork {
 
 export const ACTIVE_SOLANA_NETWORK_ENV_KEY = "NEXT_PUBLIC_SOLANA_NETWORK";
 export const SOLANA_NETWORK_COOKIE = "goalaxify-solana-network";
+export const SOLANA_NETWORK_EXPLICIT_COOKIE = "goalaxify-solana-network-explicit";
 
 export function isSolanaNetwork(
   value: string | null | undefined,
@@ -28,9 +29,15 @@ export function isSolanaNetwork(
 export function getSolanaNetworkFromEnv(
   env: EnvSource = getDefaultEnv(),
 ): SolanaNetwork {
-  return env[ACTIVE_SOLANA_NETWORK_ENV_KEY] === SolanaNetwork.MainnetBeta
-    ? SolanaNetwork.MainnetBeta
-    : SolanaNetwork.Devnet;
+  const value = env[ACTIVE_SOLANA_NETWORK_ENV_KEY];
+  if (value === SolanaNetwork.Devnet) {
+    return SolanaNetwork.Devnet;
+  }
+  if (value === SolanaNetwork.MainnetBeta) {
+    return SolanaNetwork.MainnetBeta;
+  }
+
+  return SolanaNetwork.MainnetBeta;
 }
 
 export function resolveSolanaNetwork(options?: {
