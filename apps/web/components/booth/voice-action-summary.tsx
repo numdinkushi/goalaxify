@@ -12,7 +12,7 @@ import {
   calculatePotentialPayout,
   formatTokenAmount,
 } from "@/lib/utils/prediction";
-import { formatMatchTitle } from "@/lib/utils/format";
+import { MatchTeamsTitle } from "@/components/match/match-teams-title";
 import type { BoothContext } from "@/lib/data/types";
 import type { ThreeWayOdds } from "@goalaxify/domain";
 
@@ -114,7 +114,7 @@ export function VoiceActionSummary({
             {actionLabel}
           </p>
           <h3 className="mt-1 text-lg font-bold">
-            {formatMatchTitle(context.homeTeam, context.awayTeam)}
+            <MatchTeamsTitle home={context.homeTeam} away={context.awayTeam} />
           </h3>
           <p className="mt-1 text-sm text-muted-foreground">{phaseLabel}</p>
         </div>

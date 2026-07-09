@@ -7,7 +7,7 @@ import type { Doc } from "@goalaxify/convex/_generated/dataModel";
 
 import { KickoffStatus } from "@/components/match/kickoff-status";
 import { OddsBar, OutcomePicker } from "@/components/match/odds-display";
-import { TeamDisplay } from "@/components/match/team-display";
+import { MatchTeamsShowcase } from "@/components/match/match-teams-title";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -109,15 +109,7 @@ export function MatchSpotlightCard({ match }: MatchSpotlightCardProps) {
       </CardHeader>
 
       <CardContent className="space-y-5">
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-          <TeamDisplay team={match.home} align="right" />
-          <div className="text-center">
-            <p className="text-[10px] tracking-[0.18em] text-muted-foreground uppercase">
-              {t("match.vs")}
-            </p>
-          </div>
-          <TeamDisplay team={match.away} align="left" />
-        </div>
+        <MatchTeamsShowcase home={match.home} away={match.away} />
 
         <div className="space-y-4 rounded-2xl border border-border/70 bg-muted/50 p-4">
           <OddsBar

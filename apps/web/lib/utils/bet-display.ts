@@ -2,7 +2,7 @@ import type { Doc } from "@goalaxify/convex/_generated/dataModel";
 import type { MatchOutcome, PredictionStatus } from "@goalaxify/domain";
 
 import { MAX_BET_MANAGE_COUNT } from "@/lib/constants/predictions";
-import { OUTCOME_LABELS } from "@/lib/data/types";
+import { OUTCOME_LABELS, type BoothManageBet } from "@/lib/data/types";
 import { MatchStatus } from "@/lib/enums";
 import { formatKickoffTime } from "@/lib/utils/format";
 import { formatScheduleDayLabel } from "@/lib/utils/schedule";
@@ -114,6 +114,28 @@ export function canManageBet(
   if (prediction.status !== "open") return false;
   if ((prediction.manageCount ?? 0) >= MAX_BET_MANAGE_COUNT) return false;
   return !isMatchStarted(prediction, kickoffAt, matchStatus);
+}
+
+export function toBoothManageBet(
+  prediction: Doc<"predictions">,
+  fixtureMeta?: { kickoffAt?: string; status?: string },
+): BoothManageBet | null {
+  const kickoffAt = prediction.kickoffAt ?? fixtureMeta?.kickoffAt;
+
+  if (!canManageBet(prediction, kickoffAt, fixtureMeta?.status)) {
+    return null;
+  }
+
+  return {
+    predictionId: prediction._id,
+    selection: prediction.selection,
+    stakeAmount: prediction.stakeAmount,
+    stakeToken: prediction.stakeToken,
+    homeTeam: prediction.homeTeam,
+    awayTeam: prediction.awayTeam,
+    estimatedReturn: prediction.estimatedReturn,
+    kickoffAt,
+  };
 }
 
 export function formatBetKickoff(kickoffAt?: string): {

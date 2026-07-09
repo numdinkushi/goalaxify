@@ -151,6 +151,10 @@ export function parseStakeTransactionError(
     return "Transaction cancelled in Phantom.";
   }
 
+  if (/already have an open bet on this match/i.test(raw)) {
+    return "You already have an open bet on this match. Use Manage to cancel or replace it.";
+  }
+
   if (/simulation failed|sendtransactionerror|custom program error/i.test(raw)) {
     return parseSettlementError(raw);
   }
