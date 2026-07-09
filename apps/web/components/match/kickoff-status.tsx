@@ -68,7 +68,7 @@ function KickoffStatusShell({
         <>
           <span className="font-sans tracking-normal text-muted-foreground">
             Starts in
-          </span>
+          </span> 
           <span suppressHydrationWarning>{label}</span>
         </>
       ) : (
