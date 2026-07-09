@@ -1,5 +1,6 @@
 import type { MatchOutcome, ThreeWayOdds } from "@goalaxify/domain";
 
+import { HomeAwayMarker } from "@/components/match/home-away-marker";
 import { OUTCOME_SHORT_LABELS } from "@/lib/data/types";
 import { formatPercentage, formatReturnMultiplier } from "@/lib/utils/format";
 import { getOutcomeValue } from "@/lib/utils/odds";
@@ -12,6 +13,34 @@ const OUTCOME_COLORS: Record<MatchOutcome, string> = {
   draw: "var(--odds-draw)",
   away: "var(--odds-away)",
 };
+
+function OutcomeCodeLabel({
+  outcome,
+  code,
+}: {
+  outcome: MatchOutcome;
+  code: string;
+}) {
+  if (outcome === "draw") {
+    return <span>{code}</span>;
+  }
+
+  if (outcome === "home") {
+    return (
+      <span className="inline-flex items-center justify-center gap-1">
+        <HomeAwayMarker side="home" />
+        <span>{code}</span>
+      </span>
+    );
+  }
+
+  return (
+    <span className="inline-flex items-center justify-center gap-1">
+      <span>{code}</span>
+      <HomeAwayMarker side="away" />
+    </span>
+  );
+}
 
 type OddsBarProps = {
   odds: ThreeWayOdds;
@@ -73,7 +102,8 @@ export function OddsBar({
           return (
             <div key={outcome} className="text-center">
               <p className="font-semibold text-foreground">
-                {labels[outcome]} {formatPercentage(pct)}
+                <OutcomeCodeLabel outcome={outcome} code={labels[outcome]} />{" "}
+                {formatPercentage(pct)}
               </p>
               {!compact && (
                 <p className="mt-0.5">
@@ -111,7 +141,7 @@ export function OutcomePicker({ odds, homeCode, awayCode }: OutcomePickerProps) 
             className="rounded-xl border border-border/80 bg-card/60 px-2 py-3 text-center"
           >
             <p className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
-              {labels[outcome]}
+              <OutcomeCodeLabel outcome={outcome} code={labels[outcome]} />
             </p>
             <p className="mt-1 text-lg font-bold text-foreground">
               {formatPercentage(pct)}

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { MatchSpotlightCard } from "@/components/home/match-spotlight-card";
+import { MatchTeamsTitle } from "@/components/match/match-teams-title";
 import { CollapsibleFixturePicker } from "@/components/match/collapsible-fixture-picker";
 import { useTranslation } from "@/hooks/use-translation";
 import { AppRoute } from "@/lib/enums";
@@ -44,9 +45,10 @@ export function MatchScheduleBoard({ matches }: MatchScheduleBoardProps) {
         >
           <span>
             <span className="live-dot mr-2 inline-block" aria-hidden />
-            <span className="font-medium">{liveMatch.home.name}</span>
-            <span className="text-muted-foreground"> {t("match.vs")} </span>
-            <span className="font-medium">{liveMatch.away.name}</span>
+            <MatchTeamsTitle
+              home={liveMatch.home.name}
+              away={liveMatch.away.name}
+            />
             <span className="text-muted-foreground"> {t("match.isLiveNow")}</span>
           </span>
           <span className="text-xs font-medium text-brand-coral">
@@ -61,7 +63,10 @@ export function MatchScheduleBoard({ matches }: MatchScheduleBoardProps) {
             {detailDayLabel}
           </p>
           <h3 className="text-lg font-semibold">
-            {selectedMatch.home.name} vs {selectedMatch.away.name}
+            <MatchTeamsTitle
+              home={selectedMatch.home.name}
+              away={selectedMatch.away.name}
+            />
           </h3>
         </div>
         <MatchSpotlightCard match={selectedMatch} />

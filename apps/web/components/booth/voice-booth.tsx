@@ -31,7 +31,8 @@ import {
 } from "@/lib/enums";
 import { OUTCOME_LABELS } from "@/lib/data/types";
 import type { MatchOutcome } from "@goalaxify/domain";
-import { formatKickoffTime, formatMatchTitle } from "@/lib/utils/format";
+import { formatKickoffTime } from "@/lib/utils/format";
+import { MatchTeamsTitle } from "@/components/match/match-teams-title";
 import {
   calculatePotentialPayout,
 } from "@/lib/utils/prediction";
@@ -392,6 +393,13 @@ export function VoiceBooth({
                 <p className="text-xs font-semibold tracking-[0.18em] text-muted-foreground uppercase">
                   {t("booth.voiceTitle")}
                 </p>
+                <h2 className="mt-2 text-xl font-bold">
+                  <MatchTeamsTitle
+                    home={context.homeTeam}
+                    away={context.awayTeam}
+                    size="lg"
+                  />
+                </h2>
                 <div className="mt-2 flex items-center gap-2 text-xl">
                   <span aria-hidden>{context.homeFlag}</span>
                   <span className="text-sm font-semibold text-muted-foreground">
@@ -399,9 +407,6 @@ export function VoiceBooth({
                   </span>
                   <span aria-hidden>{context.awayFlag}</span>
                 </div>
-                <h2 className="mt-2 text-xl font-bold">
-                  {formatMatchTitle(context.homeTeam, context.awayTeam)}
-                </h2>
                 <p className="mt-1 text-sm text-muted-foreground">{context.round}</p>
                 {kickoffLabel ? (
                   <p className="mt-1 text-xs text-muted-foreground">{kickoffLabel}</p>

@@ -13,12 +13,12 @@ import {
 import { SolanaNetwork } from "@goalaxify/config";
 import { useRouter } from "next/navigation";
 
+import { getSolanaRpcEndpointForClient } from "@/lib/solana/rpc-endpoint-client";
 import {
   getDefaultSolanaNetworkFromEnv,
   getInitialSolanaNetwork,
   getSolanaBalanceLabelForNetwork,
   getSolanaNetworkDisplayLabel,
-  getSolanaRpcEndpointForNetwork,
   saveSolanaNetworkPreference,
   toSettlementNetwork,
 } from "@/lib/solana/network-utils";
@@ -90,7 +90,7 @@ export function SolanaNetworkProvider({ children }: { children: ReactNode }) {
       settlementNetwork: toSettlementNetwork(network),
       networkLabel: getSolanaNetworkDisplayLabel(network),
       balanceLabel: getSolanaBalanceLabelForNetwork(network),
-      rpcEndpoint: getSolanaRpcEndpointForNetwork(network),
+      rpcEndpoint: getSolanaRpcEndpointForClient(network),
       isMainnet: network === SolanaNetwork.MainnetBeta,
       setNetwork,
       toggleNetwork,

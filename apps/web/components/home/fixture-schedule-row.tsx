@@ -1,6 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import { MatchTeamsTitle } from "@/components/match/match-teams-title";
 import type { FeaturedMatchView } from "@/lib/data/types";
 import { formatKickoffTime } from "@/lib/utils/format";
 import {
@@ -42,7 +43,7 @@ export function FixtureScheduleRow({
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-medium">
-            {match.home.name} vs {match.away.name}
+            <MatchTeamsTitle home={match.home.name} away={match.away.name} />
           </p>
           <p className="truncate text-xs text-muted-foreground">{match.round}</p>
         </div>
@@ -64,10 +65,10 @@ export function FixtureScheduleRow({
       </div>
 
       <div className="mt-2 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <span className="text-base leading-none">{match.home.flag}</span>
+        <div className="flex items-center gap-2 text-base leading-none">
+          <span aria-hidden>{match.home.flag}</span>
           <span className="text-[10px] text-muted-foreground">vs</span>
-          <span className="text-base leading-none">{match.away.flag}</span>
+          <span aria-hidden>{match.away.flag}</span>
         </div>
         {selected && !readOnly ? (
           <span className="text-[10px] font-medium text-brand-coral">

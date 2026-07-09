@@ -11,13 +11,41 @@ type KickoffStatusProps = {
   status: MatchStatus;
 };
 
+let cachedNow = 0;
+let intervalId: number | undefined;
+const listeners = new Set<() => void>();
+
+function tickNow() {
+  cachedNow = Date.now();
+  for (const listener of listeners) {
+    listener();
+  }
+}
+
 function subscribeToNow(onStoreChange: () => void) {
-  const intervalId = window.setInterval(onStoreChange, 1000);
-  return () => window.clearInterval(intervalId);
+  listeners.add(onStoreChange);
+
+  if (listeners.size === 1) {
+    cachedNow = Date.now();
+    intervalId = window.setInterval(tickNow, 1000);
+  }
+
+  return () => {
+    listeners.delete(onStoreChange);
+
+    if (listeners.size === 0 && intervalId !== undefined) {
+      window.clearInterval(intervalId);
+      intervalId = undefined;
+    }
+  };
 }
 
 function getClientNow() {
-  return Date.now();
+  if (cachedNow === 0) {
+    cachedNow = Date.now();
+  }
+
+  return cachedNow;
 }
 
 function getServerNow() {

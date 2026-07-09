@@ -2,6 +2,7 @@
 
 import { useQuery } from "convex/react";
 import { Lock } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { VoiceBooth } from "@/components/booth/voice-booth";
@@ -12,14 +13,16 @@ import {
   useFixtureKickoffs,
 } from "@/hooks/use-fixture-kickoffs";
 import { useLockPredictionsOnKickoff } from "@/hooks/use-lock-predictions-on-kickoff";
+import { usePredictions } from "@/hooks/use-predictions";
 import { useTranslation } from "@/hooks/use-translation";
 import {
+  buildManageBoothHref,
   matchToBoothContext,
   resolveInitialFixtureId,
 } from "@/lib/data/booth-context";
-import type { BoothManageBet, FeaturedMatchView } from "@/lib/data/types";
+import type { FeaturedMatchView } from "@/lib/data/types";
 import { MatchStatus } from "@/lib/enums";
-import { canManageBet } from "@/lib/utils/bet-display";
+import { toBoothManageBet } from "@/lib/utils/bet-display";
 import {
   deriveMatchStatus,
   isBoothOpenForMatch,
@@ -40,11 +43,13 @@ export function BoothPageContent({
   managePredictionId,
 }: BoothPageContentProps) {
   const { t } = useTranslation();
+  const router = useRouter();
   const defaultFixtureId = resolveInitialFixtureId(matches, initialFixtureId);
   const [selectedFixtureId, setSelectedFixtureId] = useState(defaultFixtureId);
   const [sessionLocked, setSessionLocked] = useState(false);
+  const { predictions: openPredictions } = usePredictions("open");
 
-  const prediction = useQuery(
+  const predictionFromUrl = useQuery(
     api.predictions.getById,
     isConvexConfigured() && managePredictionId
       ? { predictionId: managePredictionId as Id<"predictions"> }
@@ -54,12 +59,12 @@ export function BoothPageContent({
   const { kickoffByFixtureId, kickoffByTeams } = useFixtureKickoffs();
 
   useEffect(() => {
-    if (prediction?.fixtureId) {
-      setSelectedFixtureId(prediction.fixtureId);
+    if (predictionFromUrl?.fixtureId) {
+      setSelectedFixtureId(predictionFromUrl.fixtureId);
       return;
     }
     setSelectedFixtureId(defaultFixtureId);
-  }, [defaultFixtureId, prediction?.fixtureId]);
+  }, [defaultFixtureId, predictionFromUrl?.fixtureId]);
 
   const selectedMatch = useMemo(
     () =>
@@ -87,37 +92,71 @@ export function BoothPageContent({
     selectedMatch?.status ?? MatchStatus.Scheduled,
   );
 
-  const manageBet: BoothManageBet | null = useMemo(() => {
-    if (boothLocked || !prediction || !managePredictionId) return null;
+  const openBetForFixture = useMemo(
+    () =>
+      openPredictions.find(
+        (prediction) => prediction.fixtureId === selectedFixtureId,
+      ) ?? null,
+    [openPredictions, selectedFixtureId],
+  );
+
+  const activePrediction = useMemo(() => {
+    if (
+      predictionFromUrl &&
+      managePredictionId &&
+      predictionFromUrl.fixtureId === selectedFixtureId
+    ) {
+      return predictionFromUrl;
+    }
+
+    return openBetForFixture;
+  }, [
+    managePredictionId,
+    openBetForFixture,
+    predictionFromUrl,
+    selectedFixtureId,
+  ]);
+
+  const manageBet = useMemo(() => {
+    if (boothLocked || !activePrediction) {
+      return null;
+    }
 
     const fixtureMeta = resolveFixtureMetaForPrediction(
-      prediction,
+      activePrediction,
       kickoffByFixtureId,
       kickoffByTeams,
     );
 
-    if (
-      !canManageBet(prediction, fixtureMeta.kickoffAt, fixtureMeta.status)
-    ) {
-      return null;
-    }
-
-    return {
-      predictionId: prediction._id,
-      selection: prediction.selection,
-      stakeAmount: prediction.stakeAmount,
-      stakeToken: prediction.stakeToken,
-      homeTeam: prediction.homeTeam,
-      awayTeam: prediction.awayTeam,
-      estimatedReturn: prediction.estimatedReturn,
-      kickoffAt: fixtureMeta.kickoffAt ?? prediction.kickoffAt,
-    };
+    return toBoothManageBet(activePrediction, fixtureMeta);
   }, [
+    activePrediction,
     boothLocked,
     kickoffByFixtureId,
     kickoffByTeams,
+  ]);
+
+  useEffect(() => {
+    if (sessionLocked || boothLocked || !activePrediction || !manageBet) {
+      return;
+    }
+
+    if (managePredictionId === activePrediction._id) {
+      return;
+    }
+
+    router.replace(
+      buildManageBoothHref(selectedFixtureId, activePrediction._id),
+      { scroll: false },
+    );
+  }, [
+    activePrediction,
+    boothLocked,
+    manageBet,
     managePredictionId,
-    prediction,
+    router,
+    selectedFixtureId,
+    sessionLocked,
   ]);
 
   if (!boothContext || matches.length === 0) {
@@ -140,7 +179,7 @@ export function BoothPageContent({
               <p className="mt-1">{t("booth.lockedDescription")}</p>
             </div>
           </div>
-        ) : managePredictionId && prediction && !manageBet ? (
+        ) : activePrediction && !manageBet ? (
           <div className="rounded-2xl border border-border/80 bg-muted/30 px-4 py-3 text-sm text-muted-foreground">
             This bet can no longer be changed — it was already updated once, or
             the match has started.
@@ -148,7 +187,7 @@ export function BoothPageContent({
         ) : null}
 
         <VoiceBooth
-          key={`${boothContext.fixtureId}-${managePredictionId ?? "new"}`}
+          key={`${boothContext.fixtureId}-${activePrediction?._id ?? "new"}`}
           context={boothContext}
           manageBet={manageBet}
           boothLocked={boothLocked}
