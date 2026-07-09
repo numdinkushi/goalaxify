@@ -1,20 +1,31 @@
 import { clusterApiUrl } from "@solana/web3.js";
 import {
   getSolanaBalanceLabel,
-  getSolanaNetworkFromEnv,
   getSolanaNetworkLabel,
   getTxlineNetworkConfig,
   isSolanaNetwork,
-  resolveSolanaNetwork,
   resolveSolanaProgramId,
   resolveSolanaRpcUrl,
   SOLANA_NETWORK_COOKIE,
+  SOLANA_NETWORK_EXPLICIT_COOKIE,
   SolanaNetwork,
   toTxlineNetwork,
   type TxlineNetwork,
 } from "@goalaxify/config";
 
-import { SOLANA_NETWORK_STORAGE_KEY } from "@/lib/solana/network-constants";
+import { getClientDeploymentSolanaNetwork } from "@/lib/solana/network-env-client";
+import {
+  SOLANA_NETWORK_EXPLICIT_KEY,
+  SOLANA_NETWORK_STORAGE_KEY,
+} from "@/lib/solana/network-constants";
+
+export function hasExplicitSolanaNetworkPreference(): boolean {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  return localStorage.getItem(SOLANA_NETWORK_EXPLICIT_KEY) === "1";
+}
 
 export function getStoredSolanaNetwork(): SolanaNetwork | null {
   if (typeof window === "undefined") {
@@ -30,9 +41,14 @@ export function getStoredSolanaNetwork(): SolanaNetwork | null {
 }
 
 export function getInitialSolanaNetwork(): SolanaNetwork {
-  return resolveSolanaNetwork({
-    preference: getStoredSolanaNetwork(),
-  });
+  if (hasExplicitSolanaNetworkPreference()) {
+    const stored = getStoredSolanaNetwork();
+    if (stored) {
+      return stored;
+    }
+  }
+
+  return getClientDeploymentSolanaNetwork();
 }
 
 export function saveSolanaNetworkPreference(network: SolanaNetwork) {
@@ -41,7 +57,9 @@ export function saveSolanaNetworkPreference(network: SolanaNetwork) {
   }
 
   localStorage.setItem(SOLANA_NETWORK_STORAGE_KEY, network);
+  localStorage.setItem(SOLANA_NETWORK_EXPLICIT_KEY, "1");
   document.cookie = `${SOLANA_NETWORK_COOKIE}=${network}; path=/; max-age=31536000; SameSite=Lax`;
+  document.cookie = `${SOLANA_NETWORK_EXPLICIT_COOKIE}=1; path=/; max-age=31536000; SameSite=Lax`;
 }
 
 export function getSolanaRpcEndpointForNetwork(network: SolanaNetwork): string {
@@ -73,5 +91,5 @@ export function toSettlementNetwork(network: SolanaNetwork): TxlineNetwork {
 }
 
 export function getDefaultSolanaNetworkFromEnv(): SolanaNetwork {
-  return getSolanaNetworkFromEnv();
+  return getClientDeploymentSolanaNetwork();
 }

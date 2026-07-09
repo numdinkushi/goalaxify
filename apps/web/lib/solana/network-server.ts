@@ -3,8 +3,9 @@ import "server-only";
 import { cookies } from "next/headers";
 import {
   getSolanaNetworkFromEnv,
-  resolveSolanaNetwork,
+  isSolanaNetwork,
   SOLANA_NETWORK_COOKIE,
+  SOLANA_NETWORK_EXPLICIT_COOKIE,
   SolanaNetwork,
   toTxlineNetwork,
   type TxlineNetwork,
@@ -12,10 +13,17 @@ import {
 
 export async function getRequestSolanaNetwork(): Promise<SolanaNetwork> {
   const cookieStore = await cookies();
+  const isExplicit =
+    cookieStore.get(SOLANA_NETWORK_EXPLICIT_COOKIE)?.value === "1";
 
-  return resolveSolanaNetwork({
-    preference: cookieStore.get(SOLANA_NETWORK_COOKIE)?.value,
-  });
+  if (isExplicit) {
+    const preference = cookieStore.get(SOLANA_NETWORK_COOKIE)?.value;
+    if (isSolanaNetwork(preference)) {
+      return preference;
+    }
+  }
+
+  return getSolanaNetworkFromEnv();
 }
 
 export async function getRequestSettlementNetwork(): Promise<TxlineNetwork> {
